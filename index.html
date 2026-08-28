@@ -207,17 +207,20 @@ section:first-of-type { border-top: 0; }
   height: clamp(340px, 43vw, 596px);
   background: var(--edge-sub);
 }
+/* Width and brightness are one gesture, so they share a duration and an easing
+   curve. Held apart — .55s against .45s — the brightness finished first and the
+   highlight read as switching off while the blade was still moving. */
 .blade {
   position: relative; flex: 1 1 0; min-width: 0; overflow: hidden;
   background: var(--blade);
-  transition: flex-grow .55s cubic-bezier(.22,.61,.36,1);
+  transition: flex-grow .42s cubic-bezier(.22,.61,.36,1);
 }
 .blade video, .blade img {
   width: 100%; height: 100%; object-fit: cover; display: block;
   /* Every blade plays, all the time. Hovering one raises it to full and
      widens it; the others are never dimmed further and never paused.
      Interaction adds — the menu should not go quieter because you touched it. */
-  opacity: .7; transition: opacity .45s;
+  opacity: .7; transition: opacity .42s cubic-bezier(.22,.61,.36,1);
 }
 .blade::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -228,6 +231,11 @@ section:first-of-type { border-top: 0; }
 .menu-live:hover .blade { flex-grow: .8; }
 .menu-live .blade:hover { flex-grow: 2.3; }
 .menu-live .blade:hover video { opacity: 1; }
+/* Asymmetric on purpose: the response to the cursor arriving has to be quick
+   or it reads as lag, while the return once the cursor leaves can take its
+   time. Both properties keep the same duration within each direction. */
+.menu-live .blade:hover,
+.menu-live .blade:hover video { transition-duration: .17s; }
 .blade-label { position: absolute; top: 16px; left: 16px; right: 10px; z-index: 2; }
 .blade-label .micro { display: block; margin-bottom: 7px; }
 .blade-label b {
