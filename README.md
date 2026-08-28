@@ -4,8 +4,6 @@ Source for the case study page of **Digital Showroom**, an interactive
 real-time sales system for residential developments built in Unreal Engine 5.7.
 
 **Live page → https://danis812.github.io/digital-showroom/**
-English: [`?lang=en`](https://danis812.github.io/digital-showroom/?lang=en) ·
-Russian: [`?lang=ru`](https://danis812.github.io/digital-showroom/?lang=ru)
 
 The application itself is not in this repository. This is the page that
 documents it: how it is put together, what the five sections do, and what the
@@ -36,21 +34,9 @@ The FPS figures live in `src/build.py` as the `FPS` list, and the sound board's
 order and tail markers in `SOUNDS`. Waveforms and durations are measured from
 the WAV files at build time, so changing the pack needs no hand-editing.
 
-## Two languages, one page
-
-Russian and English both ship inside `index.html`; one is hidden by CSS. A
-`?lang=` parameter forces a language, the choice is remembered, and with no
-parameter the page follows the browser. The language lives in a query
-parameter rather than the hash because the section nav already uses `#task`,
-`#parts` and friends — a hash would be wiped by the first anchor click.
-
-The CSS only ever *hides*: the visible language keeps whatever `display` its
-own component rule gives it. Toggling display in both directions loses to the
-flex containers on specificity and prints both languages at once.
-
-Every translatable element is marked `lang="ru"` / `lang="en"`, and the build
-counts them. A block written in one language and forgotten in the other fails
-the build instead of reaching the page.
+The page carries Russian and English side by side, marked `lang="ru"` /
+`lang="en"`. Edit both; the build fails if a block exists in one and not the
+other.
 
 ## Why some assets are inlined and some are not
 

@@ -1,0 +1,3 @@
+# The build writes exact bytes and both copies are compared byte for byte.
+# Line-ending conversion would break that, so it stays off here.
+* -text
