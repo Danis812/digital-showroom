@@ -207,20 +207,20 @@ section:first-of-type { border-top: 0; }
   height: clamp(340px, 43vw, 596px);
   background: var(--edge-sub);
 }
-/* Width and brightness are one gesture, so they share a duration and an easing
-   curve. Held apart — .55s against .45s — the brightness finished first and the
-   highlight read as switching off while the blade was still moving. */
 .blade {
   position: relative; flex: 1 1 0; min-width: 0; overflow: hidden;
   background: var(--blade);
   transition: flex-grow .42s cubic-bezier(.22,.61,.36,1);
 }
+/* Width is the whole hover response, and deliberately so. Brightness was tried
+   and abandoned: two static washes sit over these clips — the blade's own top
+   gradient and the hero wash that fades the image into the page — and between
+   them the top and bottom quarters are almost black. An opacity change reads
+   clearly in the middle of a blade and not at all at its edges, so the
+   highlight looked like a patch surfacing in the centre and fleeing to the
+   sides. Width has no such problem: it is uniform over the full height. */
 .blade video, .blade img {
   width: 100%; height: 100%; object-fit: cover; display: block;
-  /* Every blade plays, all the time. Hovering one raises it to full and
-     widens it; the others are never dimmed further and never paused.
-     Interaction adds — the menu should not go quieter because you touched it. */
-  opacity: .7; transition: opacity .42s cubic-bezier(.22,.61,.36,1);
 }
 .blade::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -230,12 +230,10 @@ section:first-of-type { border-top: 0; }
    others give up width, which is enough to make them recede. */
 .menu-live:hover .blade { flex-grow: .8; }
 .menu-live .blade:hover { flex-grow: 2.3; }
-.menu-live .blade:hover video { opacity: 1; }
 /* Asymmetric on purpose: the response to the cursor arriving has to be quick
    or it reads as lag, while the return once the cursor leaves can take its
-   time. Both properties keep the same duration within each direction. */
-.menu-live .blade:hover,
-.menu-live .blade:hover video { transition-duration: .17s; }
+   time. */
+.menu-live .blade:hover { transition-duration: .17s; }
 .blade-label { position: absolute; top: 16px; left: 16px; right: 10px; z-index: 2; }
 .blade-label .micro { display: block; margin-bottom: 7px; }
 .blade-label b {
@@ -256,7 +254,6 @@ section:first-of-type { border-top: 0; }
   }
   .menu-live::-webkit-scrollbar { display: none; }
   .blade { flex: 0 0 46vw; scroll-snap-align: start; }
-  .blade video, .blade img { opacity: 1; }
   .blade-label { top: 12px; left: 12px; right: 8px; }
   .blade-label b { font-size: .84rem; }
   .blade-label .micro { font-size: 9.5px; letter-spacing: .14em; margin-bottom: 5px; }
