@@ -1,0 +1,1298 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Digital Showroom — a real-time interactive sales system for residential developments, built in Unreal Engine 5.7. A demonstration build on the architectural model of MOD Fusion, Astana.">
+<meta name="color-scheme" content="dark">
+<title>Digital Showroom</title>
+
+<script>
+// Runs before the body paints, so an English reader never sees a flash of
+// Russian. Order: explicit ?lang= wins, then a remembered choice, then the
+// browser's own language. Anchors are left alone — the nav uses #task, #parts
+// and friends, which is why the language lives in a query parameter.
+(function () {
+  var pick;
+  try {
+    var q = /[?&]lang=(ru|en)\b/.exec(location.search);
+    pick = q ? q[1] : localStorage.getItem("ds-lang");
+  } catch (e) { /* storage blocked — fall through to the browser language */ }
+  if (pick !== "ru" && pick !== "en") {
+    pick = /^ru\b/i.test(navigator.language || "") ? "ru" : "en";
+  }
+  document.documentElement.setAttribute("data-lang", pick);
+  document.documentElement.lang = pick;
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@200;300;400&display=swap">
+
+<style>
+/* ------------------------------------------------------------------
+   Visual tokens follow the product's own palette and typography.
+   The case study deliberately uses the same restrained dark theme.
+   ------------------------------------------------------------------ */
+:root {
+  --ink:      #07080A;   /* page black */
+  --panel:    #0B0C0D;   /* stage black */
+  --blade:    #101013;   /* card rest state */
+  --edge:     rgba(247,243,234,0.10);
+  --edge-sub: rgba(247,243,234,0.06);
+
+  --bright:   #F9F6EF;   /* headings */
+  --cream:    #F7F3EA;   /* body */
+  /* Three text tiers under the body colour. The dimmest is set at 0.52, not
+     lower: the micro register runs at 11px, and anything under that alpha
+     drops below a 4.5:1 contrast ratio against the ink ground. */
+  --text-2: rgba(247,243,234,0.70);   /* secondary body   ~11:1 */
+  --text-3: rgba(247,243,234,0.60);   /* tertiary          ~6.6:1 */
+  --text-4: rgba(247,243,234,0.52);   /* micro labels      ~5.2:1 */
+
+  --gold:     #FFD79A;   /* the one accent */
+  --gold-soft:#FFEBC6;
+  --cool:     #8496A8;   /* "before" state */
+  --muted:    #6A6A70;
+
+  --display: "Unbounded", "Trebuchet MS", sans-serif;
+  --body: "Golos Text", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+
+  --gutter: 84px;
+  --measure: 42rem;
+  --stage: 1400px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img { display: block; max-width: 100%; height: auto; }
+
+::selection { background: var(--gold); color: var(--ink); }
+
+a { color: var(--gold); text-decoration: none; border-bottom: 1px solid rgba(255,215,154,0.32); }
+a:hover { border-bottom-color: var(--gold); }
+a:focus-visible, [tabindex]:focus-visible {
+  outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px;
+}
+
+/* --- Language ---------------------------------------------------------
+   Both languages ship inside the page and one of them is hidden, so a single
+   file and a single URL serve either reader. English is hidden by the bare
+   selector and revealed by the higher-specificity rule, which means the page
+   still reads — in Russian — if the script never runs. */
+
+/* Only ever hides. The visible language keeps whatever display its own
+   component rule gives it — several of these blocks are flex containers, and
+   an earlier version that toggled display in both directions lost to them on
+   specificity and printed both languages at once.
+   With no data-lang set at all — script disabled — the first rule still
+   matches, so the page falls back to Russian rather than showing both. */
+html:not([data-lang="en"]) [lang="en"] { display: none !important; }
+html[data-lang="en"] [lang="ru"] { display: none !important; }
+
+.lang { display: flex; gap: 2px; flex: 0 0 auto; }
+.lang button {
+  font-family: var(--mono); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  background: none; border: 0; padding: 4px 7px; cursor: pointer;
+  color: var(--text-4); transition: color .18s;
+}
+.lang button:hover { color: var(--cream); }
+.lang button[aria-pressed="true"] { color: var(--gold); }
+.lang button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 2px; }
+
+/* --- Type registers ------------------------------------------------
+   The product has two and nothing in between: Display (very large,
+   tight) and Micro (12–15px, uppercase, widely tracked). Same here. */
+
+.micro {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-4);
+}
+
+h1, h2, h3, p, li, figcaption, .micro, .tag, .db-name { overflow-wrap: break-word; }
+
+h1, h2, h3 { font-family: var(--display); font-weight: 300; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.4rem, 7vw, 5rem); letter-spacing: -0.03em; line-height: 0.98; color: var(--bright); }
+/* Unbounded is a wide face and Russian runs long — the display step is set
+   lower than a Latin-only page would take. */
+h2 { font-size: clamp(1.45rem, 2.9vw, 2.15rem); letter-spacing: -0.015em; line-height: 1.16; color: var(--bright); }
+h3 { font-size: 1.18rem; font-weight: 400; letter-spacing: -0.01em; color: var(--bright); font-family: var(--body); }
+
+p { margin: 0; }
+strong { font-weight: 600; color: var(--bright); }
+
+.num {
+  font-family: var(--display); font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  color: var(--gold-soft); line-height: 1;
+}
+
+/* --- Shell ---------------------------------------------------------- */
+
+.rail {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 14px clamp(20px, 5vw, var(--gutter));
+  background: rgba(7,8,10,0.86);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--edge-sub);
+}
+.rail-mark { display: flex; align-items: baseline; gap: 14px; min-width: 0; }
+.rail-mark b {
+  font-family: var(--display); font-weight: 400; font-size: 13px;
+  letter-spacing: 0.28em; color: var(--bright);
+}
+.rail-mark span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rail nav { display: flex; gap: 20px; }
+.rail nav a { border: 0; color: var(--text-4); transition: color .18s; }
+.rail nav a:hover { color: var(--gold); }
+@media (max-width: 860px) { .rail nav { display: none; } }
+
+.wrap { max-width: var(--stage); margin: 0 auto; padding: 0 clamp(20px, 5vw, var(--gutter)); }
+.col { max-width: var(--measure); }
+
+section { padding: clamp(56px, 9vw, 112px) 0; border-top: 1px solid var(--edge-sub); }
+section:first-of-type { border-top: 0; }
+
+.head { display: flex; flex-direction: column; gap: 18px; margin-bottom: 40px; }
+.lede { font-size: 1.12rem; color: var(--text-2); max-width: var(--measure); }
+
+.stack { display: flex; flex-direction: column; gap: 1.15rem; max-width: var(--measure); }
+.stack p { color: var(--text-2); }
+
+/* --- Hero ----------------------------------------------------------- */
+
+.hero { position: relative; padding: 0; border: 0; }
+.hero-img { position: relative; }
+.hero-img img { width: 100%; }
+.hero-img::after {
+  content: ""; position: absolute; inset: 0;
+  /* Decorative wash over the whole hero. Without this it sits on top of the
+     blades and eats their hover — only the label, lifted by its own z-index,
+     stayed reachable. */
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(7,8,10,0.42) 0%, rgba(7,8,10,0.06) 26%,
+    rgba(7,8,10,0.30) 62%, rgba(7,8,10,0.88) 88%, var(--ink) 100%);
+}
+/* Overlaps only the already-black strip at the foot of the screenshot, so
+   the title never lands on top of the app's own typography. */
+.hero-body {
+  position: relative; z-index: 2;
+  margin-top: -4vw; padding-bottom: clamp(40px, 6vw, 72px);
+}
+/* --- Live main menu -------------------------------------------------
+   The app's own menu is five vertical blades, each playing a preview of
+   its scene. The hero reproduces it with the same clips the build uses,
+   so the page opens on the product rather than a screenshot of it.
+   The poster frames are inlined, so the hero still reads if media/ is
+   missing — you lose the motion, not the picture. */
+
+.menu-live {
+  display: flex; gap: 2px;
+  height: clamp(340px, 43vw, 596px);
+  background: var(--edge-sub);
+}
+.blade {
+  position: relative; flex: 1 1 0; min-width: 0; overflow: hidden;
+  background: var(--blade);
+  transition: flex-grow .55s cubic-bezier(.22,.61,.36,1);
+}
+.blade video, .blade img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  /* Every blade plays, all the time. Hovering one raises it to full and
+     widens it; the others are never dimmed further and never paused.
+     Interaction adds — the menu should not go quieter because you touched it. */
+  opacity: .7; transition: opacity .45s;
+}
+.blade::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(7,8,10,0.62) 0%, rgba(7,8,10,0) 34%);
+}
+/* Hovering anywhere on a blade widens it and pulls it out of the row. The
+   others give up width, which is enough to make them recede. */
+.menu-live:hover .blade { flex-grow: .8; }
+.menu-live .blade:hover { flex-grow: 2.3; }
+.menu-live .blade:hover video { opacity: 1; }
+.blade-label { position: absolute; top: 16px; left: 16px; right: 10px; z-index: 2; }
+.blade-label .micro { display: block; margin-bottom: 7px; }
+.blade-label b {
+  font-family: var(--display); font-weight: 300;
+  font-size: clamp(.74rem, 1.12vw, 1.02rem); letter-spacing: -0.01em;
+  color: var(--bright); display: block;
+}
+/* Five blades across a phone leaves 74px each, and a 924×1080 clip cropped to
+   that is a sliver, not a preview. Below 700px the menu becomes a snap strip:
+   the metaphor survives, and each clip keeps a readable aspect. */
+@media (max-width: 700px) {
+  .menu-live {
+    height: 300px; gap: 1px;
+    overflow-x: auto; overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .menu-live::-webkit-scrollbar { display: none; }
+  .blade { flex: 0 0 46vw; scroll-snap-align: start; }
+  .blade video, .blade img { opacity: 1; }
+  .blade-label { top: 12px; left: 12px; right: 8px; }
+  .blade-label b { font-size: .84rem; }
+  .blade-label .micro { font-size: 9.5px; letter-spacing: .14em; margin-bottom: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blade, .blade video { transition: none; }
+}
+
+.hero-body .eyebrow { margin-bottom: 22px; }
+.hero-body h1 { margin-bottom: 24px; }
+.hero-sub {
+  font-size: clamp(1.05rem, 2vw, 1.3rem); color: var(--text-2);
+  max-width: 34rem; margin-bottom: 34px;
+}
+.hero-meta {
+  display: flex; flex-wrap: wrap; gap: 10px 34px;
+  padding-top: 22px; border-top: 1px solid var(--edge);
+}
+.hero-meta div { display: flex; flex-direction: column; gap: 5px; }
+.hero-meta b { font-family: var(--body); font-weight: 500; font-size: 15px; color: var(--cream); }
+
+/* --- Facts strip ---------------------------------------------------- */
+
+.facts {
+  display: grid; gap: 1px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  background: var(--edge-sub);
+  border-block: 1px solid var(--edge-sub);
+}
+.fact { background: var(--ink); padding: 26px clamp(16px, 2.4vw, 28px); display: flex; flex-direction: column; gap: 9px; }
+.fact .num { font-size: clamp(2rem, 3.4vw, 2.9rem); }
+.fact .micro { letter-spacing: 0.18em; line-height: 1.5; }
+
+/* --- Numbered product sections -------------------------------------- */
+
+.parts { display: flex; flex-direction: column; gap: clamp(48px, 7vw, 92px); }
+.part { display: grid; gap: 28px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) {
+  .part { grid-template-columns: 260px minmax(0, 1fr); gap: 40px; align-items: start; }
+  /* Direct children only: unscoped, this also caught .part-figure used inside
+     other grids and made every one of them span all columns. */
+  .part > .part-figure { grid-column: 1 / -1; }
+}
+.part-index { display: flex; flex-direction: column; gap: 12px; }
+.part-index .idx {
+  font-family: var(--display); font-weight: 200; font-size: 2.6rem;
+  color: var(--gold); line-height: 1; font-variant-numeric: tabular-nums;
+}
+.part-body { display: flex; flex-direction: column; gap: 1rem; max-width: var(--measure); }
+.part-body p { color: var(--text-2); }
+/* margin-inline only: the UA default of 1em 40px was insetting every figure
+   40px from the text above it, and eating 80px of a 375px phone. Vertical
+   rhythm stays as it was. */
+.part-figure { display: flex; flex-direction: column; gap: 12px; margin-inline: 0; }
+.part-figure img { border: 1px solid var(--edge-sub); }
+figcaption { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-4); }
+
+/* --- UI sound board --------------------------------------------------
+   Nine buttons that actually play the pack. The section makes claims about
+   restraint and about where the signature tail sits; this is the part that
+   lets a reader check them instead of taking my word for it. */
+
+.sndboard {
+  display: grid; gap: 1px;
+  grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+  background: var(--edge-sub); border: 1px solid var(--edge-sub);
+}
+.snd {
+  background: var(--blade); border: 0; cursor: pointer; text-align: left;
+  font: inherit; color: inherit;
+  padding: 18px 20px; display: flex; flex-direction: column; gap: 11px;
+  transition: background .2s;
+}
+.snd:hover { background: #131319; }
+.snd.is-playing { background: #17171f; }
+.snd:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.snd-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; min-height: 13px; }
+.snd-head .micro { color: var(--gold); letter-spacing: 0.18em; }
+.snd-ms { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--text-4); }
+.snd-wave { width: 100%; height: 44px; display: block; }
+.snd-wave polygon { fill: var(--cool); transition: fill .2s; }
+.snd:hover .snd-wave polygon,
+.snd.is-playing .snd-wave polygon { fill: var(--gold-soft); }
+.snd-name { font-size: 15px; color: var(--text-2); }
+.sndboard-note { margin-top: 14px; color: var(--text-4); font-size: 13.5px; }
+
+/* Full-width player. preload="none" so the hero loops get the bandwidth
+   first — the poster carries the block until someone actually presses play. */
+.filmstrip { border: 1px solid var(--edge-sub); background: #000; }
+.filmstrip video { width: 100%; display: block; aspect-ratio: 16 / 9; background: #000; }
+/* Two players side by side: the same pipeline fed two different marks. Stacked
+   below 860px, where a half-width 16:9 video stops being watchable. */
+.twoup { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 860px) { .twoup { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.tag {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-3); border: 1px solid var(--edge); border-radius: 2px; padding: 5px 10px;
+}
+
+/* --- Cards ---------------------------------------------------------- */
+
+/* Fixed counts rather than auto-fit: both card grids hold exactly six, and
+   auto-fit leaves half-empty rows showing through as bare gap colour. */
+.cards { display: grid; gap: 1px; grid-template-columns: 1fr; background: var(--edge-sub); border: 1px solid var(--edge-sub); }
+@media (min-width: 620px)  { .cards { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+.card { background: var(--blade); padding: 28px; display: flex; flex-direction: column; gap: 12px; }
+.card p { color: var(--text-2); font-size: 15.5px; }
+.card .micro { color: var(--gold); letter-spacing: 0.2em; }
+
+/* --- Table ---------------------------------------------------------- */
+
+.scroller { overflow-x: auto; border: 1px solid var(--edge-sub); }
+table { border-collapse: collapse; width: 100%; min-width: 620px; font-size: 15px; }
+caption { text-align: left; padding: 16px 20px; border-bottom: 1px solid var(--edge-sub); color: var(--text-3); font-size: 13px; }
+th, td { padding: 12px 20px; text-align: right; border-bottom: 1px solid var(--edge-sub); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+thead th { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-4); font-weight: 500; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody td { color: var(--text-2); }
+tbody td.after { color: var(--bright); }
+tbody td.delta { color: var(--gold); }
+
+/* --- Dumbbell chart -------------------------------------------------- */
+
+.charts { display: grid; gap: 34px; grid-template-columns: repeat(auto-fit, minmax(288px, 1fr)); margin-bottom: 28px; }
+.panel {
+  display: flex; flex-direction: column; gap: 16px; min-width: 0;
+  --chart-cols: 96px 40px minmax(80px, 1fr) 40px;
+  --chart-gap: 12px;
+}
+@media (max-width: 560px) {
+  .panel { --chart-cols: 74px 34px minmax(52px, 1fr) 34px; --chart-gap: 8px; }
+}
+.panel-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.legend { display: flex; gap: 16px; align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.swatch { width: 9px; height: 9px; border-radius: 50%; }
+.sw-before { background: var(--cool); }
+.sw-after  { background: var(--gold); }
+
+.db { display: flex; flex-direction: column; }
+.db-row {
+  display: grid; align-items: center;
+  grid-template-columns: var(--chart-cols);
+  gap: var(--chart-gap); padding: 9px 8px; border-radius: 2px;
+  position: relative; transition: background .16s;
+}
+.db-row:hover, .db-row:focus-visible { background: rgba(247,243,234,0.045); }
+.db-name { font-size: 13.5px; color: var(--text-2); }
+.db-num { font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; color: var(--text-3); text-align: right; }
+.db-num.is-after { color: var(--bright); }
+
+.db-track { position: relative; height: 18px; }
+.db-track::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%;
+  height: 1px; background: var(--edge-sub);
+}
+.db-ref {
+  position: absolute; top: -3px; bottom: -3px; left: var(--ref);
+  width: 1px; background: repeating-linear-gradient(180deg, rgba(247,243,234,0.22) 0 3px, transparent 3px 6px);
+}
+.db-line {
+  position: absolute; top: 50%; height: 2px; transform: translateY(-50%);
+  left: var(--a); width: var(--w);
+  background: linear-gradient(90deg, rgba(132,150,168,0.55), rgba(255,215,154,0.75));
+  transform-origin: left center;
+  transition: transform .7s cubic-bezier(.22,.8,.28,1);
+}
+.db-dot {
+  position: absolute; top: 50%; width: 9px; height: 9px; border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 2px var(--ink);
+  transition: left .7s cubic-bezier(.22,.8,.28,1);
+}
+.db-dot.is-before { background: var(--cool); left: var(--a); }
+.db-dot.is-after  { background: var(--gold); left: var(--b); width: 11px; height: 11px; }
+
+/* Anchored to the row's own box so it can never widen the page: the pill
+   centres inside a full-width strip rather than sticking out of one. */
+.db-tip {
+  position: absolute; left: 8px; right: 8px; bottom: calc(100% - 4px);
+  text-align: center; z-index: 5;
+  opacity: 0; pointer-events: none; transition: opacity .14s;
+}
+.db-tip span {
+  display: inline-block; max-width: 100%;
+  background: var(--blade); border: 1px solid var(--edge);
+  padding: 6px 11px; border-radius: 2px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--cream);
+}
+.db-row:hover .db-tip, .db-row:focus-visible .db-tip { opacity: 1; }
+.db-tip b { color: var(--gold); font-weight: 500; }
+
+.axis {
+  display: grid; grid-template-columns: var(--chart-cols); gap: var(--chart-gap);
+  padding: 4px 8px 0; margin-top: 2px; border-top: 1px solid var(--edge-sub);
+}
+.axis-scale { grid-column: 3; position: relative; height: 18px; }
+.axis-scale i {
+  position: absolute; left: var(--x); transform: translateX(-50%);
+  font-family: var(--mono); font-style: normal; font-size: 10px; color: var(--text-4);
+}
+
+/* Chart entry animation: bars grow once, on first view. Gated on .js-anim,
+   which the script adds only when it can also guarantee the reveal — so
+   without JS the chart simply renders finished. */
+.js-anim .db:not(.in) .db-line { transform: translateY(-50%) scaleX(0); }
+.js-anim .db:not(.in) .db-dot.is-after { left: var(--a); }
+
+/* --- Hero stat ------------------------------------------------------- */
+
+.hero-stat {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 26px;
+  padding: 30px; border: 1px solid var(--edge); background: var(--panel);
+  margin-bottom: 40px;
+}
+.hero-stat .num { font-size: clamp(2.6rem, 6vw, 4.4rem); }
+.hero-stat .arrow { color: var(--text-4); font-family: var(--display); font-size: 1.6rem; font-weight: 200; }
+.hero-stat .note { color: var(--text-3); font-size: 14.5px; max-width: 22rem; }
+
+/* --- Timeline -------------------------------------------------------- */
+
+.phases { display: flex; flex-direction: column; }
+.phase {
+  display: grid; gap: 6px 32px; padding: 22px 0;
+  border-top: 1px solid var(--edge-sub);
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 760px) { .phase { grid-template-columns: 190px minmax(0, 1fr); } }
+.phase:last-child { border-bottom: 1px solid var(--edge-sub); }
+.phase-when { display: flex; flex-direction: column; gap: 5px; }
+.phase-when b { font-family: var(--body); font-weight: 500; font-size: 15px; color: var(--bright); }
+.phase p { color: var(--text-2); font-size: 15.5px; }
+
+/* --- Role list ------------------------------------------------------- */
+
+.roles { display: grid; gap: 1px; grid-template-columns: 1fr; background: var(--edge-sub); border: 1px solid var(--edge-sub); }
+@media (min-width: 620px)  { .roles { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .roles { grid-template-columns: repeat(4, 1fr); } }
+.role { background: var(--panel); padding: 24px; display: flex; flex-direction: column; gap: 10px; }
+.role ul { margin: 0; padding-left: 1.05em; color: var(--text-2); font-size: 15px; display: flex; flex-direction: column; gap: 6px; }
+.role li::marker { color: var(--gold); }
+
+/* --- Footer ---------------------------------------------------------- */
+
+footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edge); }
+.sign { display: flex; flex-wrap: wrap; gap: 28px 60px; align-items: flex-end; justify-content: space-between; }
+.sign h2 { font-size: clamp(1.8rem, 5vw, 3.2rem); }
+.sign-meta { display: flex; flex-direction: column; gap: 8px; }
+
+/* --- Reveal on scroll ------------------------------------------------ */
+
+.js-anim .rise { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s cubic-bezier(.22,.8,.28,1); }
+.js-anim .rise.in { opacity: 1; transform: none; }
+</style>
+
+<header class="rail">
+  <div class="rail-mark">
+    <b>DIGITAL&nbsp;SHOWROOM</b>
+    <span class="micro" lang="ru">MOD Fusion · Астана · 2026</span>
+    <span class="micro" lang="en">MOD Fusion · Astana · 2026</span>
+  </div>
+  <nav class="micro">
+    <a href="#task"><span lang="ru">Цель</span><span lang="en">Goal</span></a>
+    <a href="#parts"><span lang="ru">Разделы</span><span lang="en">Sections</span></a>
+    <a href="#arch"><span lang="ru">Устройство</span><span lang="en">Build</span></a>
+    <a href="#perf"><span lang="ru">Оптимизация</span><span lang="en">Performance</span></a>
+    <a href="#identity"><span lang="ru">Идентичность</span><span lang="en">Identity</span></a>
+    <a href="#timeline"><span lang="ru">Хронология</span><span lang="en">Timeline</span></a>
+  </nav>
+  <div class="lang">
+    <button type="button" data-set-lang="ru">RU</button>
+    <button type="button" data-set-lang="en">EN</button>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-img">
+    <div class="menu-live">
+      <div class="blade">
+        <video poster="__POSTER_walk__" muted loop autoplay playsinline preload="none" aria-hidden="true"><source src="media/loop-walk.mp4" type="video/mp4"></video>
+        <span class="blade-label"><span class="micro">01</span><b><span lang="ru">Прогулка</span><span lang="en">Walkthrough</span></b></span>
+      </div>
+      <div class="blade">
+        <video poster="__POSTER_zones__" muted loop autoplay playsinline preload="none" aria-hidden="true"><source src="media/loop-zones.mp4" type="video/mp4"></video>
+        <span class="blade-label"><span class="micro">02</span><b><span lang="ru">Зоны</span><span lang="en">Amenities</span></b></span>
+      </div>
+      <div class="blade">
+        <video poster="__POSTER_units__" muted loop autoplay playsinline preload="none" aria-hidden="true"><source src="media/loop-units.mp4" type="video/mp4"></video>
+        <span class="blade-label"><span class="micro">03</span><b><span lang="ru">Квартиры</span><span lang="en">Apartments</span></b></span>
+      </div>
+      <div class="blade">
+        <video poster="__POSTER_map__" muted loop autoplay playsinline preload="none" aria-hidden="true"><source src="media/loop-map.mp4" type="video/mp4"></video>
+        <span class="blade-label"><span class="micro">04</span><b><span lang="ru">Карта</span><span lang="en">Map</span></b></span>
+      </div>
+      <div class="blade">
+        <video poster="__POSTER_film__" muted loop autoplay playsinline preload="none" aria-hidden="true"><source src="media/loop-film.mp4" type="video/mp4"></video>
+        <span class="blade-label"><span class="micro">05</span><b><span lang="ru">Фильм</span><span lang="en">Film</span></b></span>
+      </div>
+    </div>
+  </div>
+  <div class="wrap hero-body">
+    <p class="micro eyebrow" lang="ru">Интерактивный опыт для продаж недвижимости · Unreal Engine 5.7</p>
+    <p class="micro eyebrow" lang="en">Interactive Real Estate Experience · Unreal Engine 5.7</p>
+    <h1>DIGITAL&nbsp;SHOWROOM</h1>
+    <p class="hero-sub" lang="ru">Интерактивная real-time система для продажи жилой недвижимости: свободная прогулка, зоны благоустройства, поиск квартир прямо на фасаде, карта окружения и галерея квартала по главам. Демонстрационная сборка на архитектурной модели MOD Fusion — реального жилого квартала в Астане.</p>
+    <p class="hero-sub" lang="en">A real-time interactive sales system for residential developments: free walkthrough, courtyard amenities, apartment search straight on the facade, a neighbourhood map and a chaptered gallery of the quarter. A demonstration build, made on the architectural model of MOD Fusion — a real residential quarter in Astana.</p>
+    <div class="hero-meta">
+      <div><span class="micro"><span lang="ru">Роль</span><span lang="en">Role</span></span><b>Solo design &amp; development</b></div>
+      <div><span class="micro"><span lang="ru">Срок</span><span lang="en">Duration</span></span><b><span lang="ru">9 месяцев</span><span lang="en">9 months</span></b></div>
+      <div><span class="micro"><span lang="ru">Движок</span><span lang="en">Engine</span></span><b>Unreal Engine 5.7</b></div>
+      <div><span class="micro"><span lang="ru">Код</span><span lang="en">Code</span></span><b>C++ · Slate</b></div>
+      <div><span class="micro"><span lang="ru">Платформа</span><span lang="en">Platform</span></span><b>Windows · Pixel Streaming</b></div>
+    </div>
+  </div>
+</section>
+
+<div class="facts">
+  <div class="fact"><span class="num">03</span><span class="micro"><span lang="ru">Режима в одной realtime-сцене</span><span lang="en">Modes in one realtime scene</span></span></div>
+  <div class="fact"><span class="num">44k</span><span class="micro"><span lang="ru">Строк C++ в пяти плагинах</span><span lang="en">Lines of C++ across five plugins</span></span></div>
+  <div class="fact"><span class="num">168</span><span class="micro"><span lang="ru">Скриптов автоматизации</span><span lang="en">Automation scripts</span></span></div>
+  <div class="fact"><span class="num">+447<span style="font-size:.5em">%</span></span><span class="micro"><span lang="ru">Средний FPS в тяжёлом разделе</span><span lang="en">Average FPS in the heaviest section</span></span></div>
+</div>
+
+<main class="wrap">
+
+  <section id="demo">
+    <div class="head rise">
+      <p class="micro"><span lang="ru">Демонстрация</span><span lang="en">Demonstration</span></p>
+      <h2 lang="ru">Две минуты в приложении</h2>
+      <h2 lang="en">Two minutes inside the application</h2>
+      <p class="lede" lang="ru">Непрерывная запись упакованного билда: главное меню, прогулка от первого лица, зоны благоустройства, поиск квартир, карта окружения и фильм. Разделы показаны так, как их видит покупатель.</p>
+      <p class="lede" lang="en">One continuous capture from the packaged build: main menu, first-person walkthrough, courtyard amenities, apartment search, neighbourhood map and film. The sections are shown the way a buyer meets them.</p>
+    </div>
+    <figure class="part-figure rise">
+      <div class="filmstrip">
+        <video controls preload="none" playsinline poster="__POSTER_full__">
+          <source src="media/showroom-full.mp4" type="video/mp4">
+        </video>
+      </div>
+      <figcaption lang="ru">Проходка по всем разделам · захват из упакованного Windows-билда · 1:56</figcaption>
+      <figcaption lang="en">Full walkthrough of every section · captured from the packaged Windows build · 1:56</figcaption>
+    </figure>
+  </section>
+
+  <section id="task">
+    <div class="head rise">
+      <p class="micro"><span lang="ru">01 · Цель проекта</span><span lang="en">01 · Goal</span></p>
+      <h2 lang="ru">Не презентация одного дома, а система, которую можно поставить на следующий</h2>
+      <h2 lang="en">Not a presentation of one building, but a system you can put on the next one</h2>
+    </div>
+    <div class="stack rise">
+      <p lang="ru">Digital Showroom — независимая R&amp;D-разработка: автономное интерактивное приложение для продажи жилой недвижимости, рассчитанное на большой экран или тачскрин в офисе продаж — как самостоятельный киоск или как инструмент в руках менеджера.</p>
+      <p lang="en">Digital Showroom is independent R&amp;D: a standalone interactive application for selling residential property, built for a large screen or a touch display on the sales floor — as a self-serve kiosk or as a tool in a manager's hands.</p>
+      <p lang="ru">Вместо набора статичных рендеров и отдельных страниц покупатель получает единое трёхмерное пространство: можно исследовать квартал и благоустройство, посмотреть окружение, понять расположение объектов, найти конкретную квартиру на фасаде и перейти к её параметрам и планировке. Задача состояла в том, чтобы объединить визуализацию, навигацию по проекту и каталог квартир в один понятный realtime-инструмент — и проверить, насколько такой формат делает ещё не построенный объект нагляднее для покупателя.</p>
+      <p lang="en">Instead of a set of static renders and separate pages, the buyer gets one three-dimensional space: explore the quarter and its courtyards, read the neighbourhood, understand where things sit, find a specific apartment on the facade and open its figures and floor plan. The task was to fold visualisation, navigation and the apartment catalogue into a single legible realtime tool — and to find out how much clearer that format makes a building that does not exist yet.</p>
+      <p lang="ru"><strong>Почему это система, а не проект.</strong> Приложение, дизайн-система, интерфейс, плагины и редакторский инструментарий не привязаны к конкретному кварталу. Входные данные — архитектурная модель и таблица квартир; всё остальное переиспользуется. Следующий объект собирается тем же пайплайном и заметно быстрее, потому что заново пишется только контент, а не платформа.</p>
+      <p lang="en"><strong>Why this is a system, not a one-off.</strong> The application, the design system, the interface, the plugins and the editor tooling are not tied to this particular development. The inputs are an architectural model and an apartment table; everything else is reused. The next building is assembled with the same pipeline and considerably faster, because only the content is written again — not the platform.</p>
+      <p lang="ru"><strong>Как это встраивается в работу с архитектурой.</strong> Проект показывает путь от готовой архитектурной модели до интерактивного приложения, которое девелопер может поставить в офис продаж. Для архитектурного бюро это способ расширить собственное предложение клиенту, не выходя за рамки своей работы: модель уже есть, дальше подключается realtime-часть.</p>
+      <p lang="en"><strong>How it fits alongside architectural work.</strong> The project traces the path from a finished architectural model to an interactive application a developer can place on the sales floor. For an architecture practice it is a way to widen what it offers a client without stepping outside its own work: the model already exists, and the realtime part attaches to it.</p>
+      <p lang="ru"><strong>Моя роль.</strong> Solo design &amp; development: подготовка архитектурной модели для Unreal Engine, построение realtime-сцены, свет, UX/UI, интерактивная логика, пять C++-плагинов, процедурная айдентика и звук, оптимизация, packaging и Pixel Streaming.</p>
+      <p lang="en"><strong>My role.</strong> Solo design &amp; development: preparing the architectural model for Unreal Engine, building the realtime scene, lighting, UX/UI, interaction logic, five C++ plugins, procedural identity and sound, optimisation, packaging and Pixel Streaming.</p>
+      <p lang="ru"><strong>Исходные материалы.</strong> Архитектурная модель квартала и часть статичных визуализаций предоставлены Whila. Архитектурный моделинг и авторство этих изображений не входят в мою работу.</p>
+      <p lang="en"><strong>Source material.</strong> The architectural model of the quarter and part of the static visualisations were provided by Whila. Architectural modelling and the authorship of those images are not my work.</p>
+    </div>
+  </section>
+
+  <section id="parts">
+    <div class="head rise">
+      <p class="micro"><span lang="ru">02 · Разделы</span><span lang="en">02 · Sections</span></p>
+      <h2 lang="ru">Пять разделов, три из них — режимы одной сцены</h2>
+      <h2 lang="en">Five sections, three of them modes of one scene</h2>
+      <p class="lede" lang="ru">Режим прогулки, зоны и поиск квартир работают в одной загруженной realtime-сцене и переключаются между собой без перезагрузки мира: меняются камера, интерфейс и правила взаимодействия. Фильм и карта устроены иначе — это отдельные разделы со своим содержимым.</p>
+      <p class="lede" lang="en">The walkthrough, the amenities and the apartment search run inside one loaded realtime scene and switch between each other without reloading the world: the camera, the interface and the interaction rules change. The film and the map are built differently — separate sections with their own content.</p>
+    </div>
+
+    <figure class="part-figure rise" style="margin-bottom: clamp(48px, 7vw, 92px)">
+      <img data-alt-en="Main menu: five vertical section blades on black, the neighbourhood map selected." src="__IMG_menu__" alt="Главное меню приложения: пять вертикальных полос-разделов на чёрном фоне, выбран раздел «Карта окружения»." width="1400" height="788">
+      <figcaption lang="ru">Главное меню · выбран раздел «Карта окружения» · превью каждой полосы играет в реальном времени</figcaption>
+      <figcaption lang="en">Main menu · the neighbourhood map selected · every blade plays its preview in real time</figcaption>
+    </figure>
+
+    <div class="parts">
+      <article class="part rise">
+        <div class="part-index">
+          <span class="idx">01</span>
+          <h3 lang="ru">Прогулка</h3>
+          <h3 lang="en">Walkthrough</h3>
+          <p class="micro"><span lang="ru">От первого лица</span><span lang="en">First person</span></p>
+        </div>
+        <div class="part-body">
+          <p lang="ru">Свободное перемещение по двору и улице: WASD, мышь, Shift для ускорения, цифры для смены локации. Камера не привязана к заранее заданной траектории — пользователь самостоятельно исследует сцену.</p>
+          <p lang="en">Free movement through the courtyard and the street: WASD, mouse, Shift to sprint, number keys to change location. The camera follows no predefined path — the visitor explores the scene on their own.</p>
+          <div class="tag-row">
+            <span class="tag"><span lang="ru">Две локации</span><span lang="en">Two locations</span></span><span class="tag"><span lang="ru">Свободная камера</span><span lang="en">Free camera</span></span><span class="tag">Nanite + Lumen</span>
+          </div>
+        </div>
+        <figure class="part-figure">
+          <img data-alt-en="First-person view: a pedestrian promenade with fountains, trees and residential facades; control hints top right, location switch along the bottom." src="__IMG_walk__" alt="Вид от первого лица: пешеходный променад с фонтанами, деревьями и жилыми фасадами; справа вверху подсказки управления, внизу выбор локации." width="1400" height="788">
+          <figcaption lang="ru">Прогулка · локация «улица» · подсказки управления справа вверху, выбор локации внизу</figcaption>
+          <figcaption lang="en">Walkthrough · the street location · control hints top right, location switch along the bottom</figcaption>
+        </figure>
+      </article>
+      <article class="part rise">
+        <div class="part-index">
+          <span class="idx">02</span>
+          <h3 lang="ru">Зоны</h3>
+          <h3 lang="en">Amenities</h3>
+          <p class="micro"><span lang="ru">10 зон благоустройства</span><span lang="en">10 courtyard spaces</span></p>
+        </div>
+        <div class="part-body">
+          <p lang="ru">Двор разбит на десять пространств: аллея, игровая зона, воркаут, футбольное поле, рампа, зоны отдыха и паркинги. В общем виде используются world-space подписи, привязанные к объектам сцены.</p>
+          <p lang="en">The courtyard is divided into ten spaces: promenade, play area, workout, football pitch, garden ramp, lounges and parking. In the overview they carry world-space labels anchored to the objects themselves.</p>
+          <p lang="ru">По выбору зоны камера переходит к ней с орбитальным облётом. Для зон и поиска квартир используется общий camera rig; различаются ограничения движения и целевые состояния.</p>
+          <p lang="en">Selecting a zone flies the camera to it on an orbital move. The amenities and the apartment search share one camera rig; what differs is the movement limits and the target states.</p>
+          <div class="tag-row">
+            <span class="tag"><span lang="ru">4 категории</span><span lang="en">4 categories</span></span><span class="tag"><span lang="ru">Подписи в мире</span><span lang="en">World-space labels</span></span><span class="tag"><span lang="ru">Облёт по клику</span><span lang="en">Fly-to on click</span></span>
+          </div>
+        </div>
+        <figure class="part-figure">
+          <img data-alt-en="Amenities section: the courtyard seen from above, spaces labelled in the scene itself — promenade, workout, football pitch, play area, BBQ lounge, parking; category list on the left." src="__IMG_zones__" alt="Раздел «Зоны»: вид сверху на двор квартала, зоны подписаны прямо в сцене — променад, воркаут, футбольное поле, игровая, зона барбекю, парковка; слева список категорий." width="1400" height="788">
+          <figcaption lang="ru">Зоны · общий вид двора · все десять зон, подписи привязаны к объектам сцены</figcaption>
+          <figcaption lang="en">Amenities · courtyard overview · all ten spaces, labels anchored to the objects in the scene</figcaption>
+        </figure>
+      </article>
+      <article class="part rise">
+        <div class="part-index">
+          <span class="idx">03</span>
+          <h3 lang="ru">Поиск квартир</h3>
+          <h3 lang="en">Apartment search</h3>
+          <p class="micro"><span lang="ru">Каталог на фасаде</span><span lang="en">Catalogue on the facade</span></p>
+        </div>
+        <div class="part-body">
+          <p lang="ru">Самый функционально насыщенный раздел. Фильтр по числу комнат, площади и бюджету применяется непосредственно к фасаду: подходящие квартиры подсвечиваются объёмами на здании, остальные приглушаются. Каталожные данные таким образом связаны с конкретным положением квартиры в 3D-сцене.</p>
+          <p lang="en">The densest section of the five. Filters for rooms, area and budget apply straight to the facade: matching apartments light up as volumes on the building and the rest dim back. Catalogue data is bound to the apartment&rsquo;s actual position in the 3D scene.</p>
+          <p lang="ru">Для каждой квартиры хранятся статус (свободна, бронь, продана), площадь, цена, цена за квадратный метр, корпус и этаж. До трёх квартир можно открыть в сравнении вместе с планировками и полными характеристиками.</p>
+          <p lang="en">Each apartment carries its status (available, reserved, sold), area, price, price per square metre, building and floor. Up to three can be opened side by side with their floor plans and full figures.</p>
+          <div class="tag-row">
+            <span class="tag"><span lang="ru">Фильтр на фасаде</span><span lang="en">Filter on the facade</span></span><span class="tag"><span lang="ru">Статусы</span><span lang="en">Statuses</span></span><span class="tag"><span lang="ru">Сравнение до 3</span><span lang="en">Compare up to 3</span></span><span class="tag"><span lang="ru">Планировки</span><span lang="en">Floor plans</span></span>
+          </div>
+        </div>
+        <figure class="part-figure">
+          <img data-alt-en="Apartments section: the building facade with matching units lit up, filters for rooms, area and budget on the left, status counters and the price range." src="__IMG_units__" alt="Раздел «Квартиры»: фасад здания с подсвеченными квартирами, слева фильтры по комнатам, площади и бюджету, счётчики статусов и диапазон цен." width="1400" height="788">
+          <figcaption lang="ru">Поиск квартир · применён фильтр по площади 40–55 м² · шестнадцать подходящих квартир подсвечены на юго-западном фасаде</figcaption>
+          <figcaption lang="en">Apartment search · area filter set to 40–55 m² · sixteen matching units lit on the southwest facade</figcaption>
+        </figure>
+        <figure class="part-figure">
+          <img data-alt-en="Compare screen: three apartment floor plans side by side with status, area, price and price per square metre." src="__IMG_compare__" alt="Экран сравнения: три планировки квартир рядом со статусами, площадью, ценой и ценой за квадратный метр." width="1400" height="788">
+          <figcaption lang="ru">Сравнение · три квартиры со статусами, планировками и ценой за квадратный метр</figcaption>
+          <figcaption lang="en">Compare · three apartments with statuses, floor plans and price per square metre</figcaption>
+        </figure>
+      </article>
+      <article class="part rise">
+        <div class="part-index">
+          <span class="idx">04</span>
+          <h3 lang="ru">Карта окружения</h3>
+          <h3 lang="en">Neighbourhood map</h3>
+          <p class="micro"><span lang="ru">28 объектов рядом</span><span lang="en">28 places nearby</span></p>
+        </div>
+        <div class="part-body">
+          <p lang="ru">Двадцать восемь объектов инфраструктуры — школы, транспорт, парки, магазины, спорт и кафе — собраны в отдельном режиме с фильтрацией по категориям и изохронами пешей доступности.</p>
+          <p lang="en">Twenty-eight everyday places — schools, transport, parks, shops, sport and cafés — collected in a separate mode with category filters and walking-distance isochrones.</p>
+          <p lang="ru">Гистограмма показывает распределение по времени пешком и следует за активным фильтром: на кадре выбрана категория «образование». По выбору точки строится маршрут с расстоянием и временем.</p>
+          <p lang="en">The histogram shows how the places spread across walking time and follows the active filter — education is selected in this frame. Picking a point draws the route with its distance and duration.</p>
+          <div class="tag-row">
+            <span class="tag"><span lang="ru">6 категорий</span><span lang="en">6 categories</span></span><span class="tag"><span lang="ru">Изохроны</span><span lang="en">Isochrones</span></span><span class="tag"><span lang="ru">Автотур по точкам</span><span lang="en">Auto tour</span></span>
+          </div>
+        </div>
+        <figure class="part-figure">
+          <img data-alt-en="Map section: an aerial view of the district at sunset, category list with counts on the left, a walking route to the selected kindergarten and the walking-time histogram bottom right." src="__IMG_map__" alt="Раздел «Карта»: аэрофотоснимок района в закатном свете, слева список категорий с количеством объектов, на карте маршрут до выбранного детского сада и гистограмма времени пешком справа внизу." width="1400" height="788">
+          <figcaption lang="ru">Карта окружения · фильтр «образование» · маршрут до детского сада, 4 минуты и 320 метров</figcaption>
+          <figcaption lang="en">Neighbourhood map · education filter · route to the kindergarten, 4 minutes and 320 metres</figcaption>
+        </figure>
+      </article>
+      <article class="part rise">
+        <div class="part-index">
+          <span class="idx">05</span>
+          <h3 lang="ru">Фильм</h3>
+          <h3 lang="en">Film</h3>
+          <p class="micro"><span lang="ru">Девять глав</span><span lang="en">Nine chapters</span></p>
+        </div>
+        <div class="part-body">
+          <p lang="ru">Девять глав ведут по кварталу заданным маршрутом: площадь, фасад, вход, первый этаж, мощение, сад, игровая зона, деталь, двор. У каждой свой кадр, текст и состояние интерфейса.</p>
+          <p lang="en">Nine chapters follow a set route through the quarter: plaza, facade, entrance, ground floor, paving, garden, play area, detail, courtyard. Each carries its own frame, text and UI state.</p>
+          <div class="tag-row">
+            <span class="tag"><span lang="ru">Кроссфейд глав</span><span lang="en">Chapter crossfade</span></span>
+          </div>
+        </div>
+        <figure class="part-figure">
+          <img data-alt-en="Film section: on the left a plaza frame with cafés and trees carrying the chapter title and caption, on the right a brick facade frame, with the nine-chapter strip along the bottom." src="__IMG_film__" alt="Раздел «Фильм»: слева кадр площади с кафе и деревьями, поверх него заголовок главы и подпись, справа кадр кирпичного фасада, внизу лента из девяти глав." width="1400" height="788">
+          <figcaption lang="ru">Фильм · глава 01 «Plaza» · лента девяти глав внизу кадра</figcaption>
+          <figcaption lang="en">Film · chapter 01 “Plaza” · the nine-chapter strip along the bottom</figcaption>
+        </figure>
+      </article>
+    </div>
+  </section>
+
+  <section id="arch">
+    <div class="head rise">
+      <p class="micro"><span lang="ru">03 · Устройство</span><span lang="en">03 · Build</span></p>
+      <h2 lang="ru">Нативный интерфейс на Slate / C++</h2>
+      <h2 lang="en">A native interface in Slate / C++</h2>
+      <p class="lede" lang="ru">Основной интерфейс реализован на Slate / C++. Навигация, состояния разделов, переходы и общие UI-параметры собраны в единой кодовой системе — это упростило развитие интерфейса и сохранение согласованного поведения между режимами приложения.</p>
+      <p class="lede" lang="en">The interface is written in Slate / C++. Navigation, section states, transitions and the shared UI parameters live in one code system — which made the interface easier to grow and kept its behaviour consistent across the modes.</p>
+    </div>
+
+    <div class="cards rise">
+      <div class="card">
+        <p class="micro">Application core</p>
+        <h3 lang="ru">Навигация и состояния</h3>
+        <h3 lang="en">Navigation and state</h3>
+        <p lang="ru">Единая логика связывает экраны, состояния разделов, поведение камер, переходы и основные интерактивные сценарии.</p>
+        <p lang="en">One body of logic ties together the screens, the section states, camera behaviour, transitions and the main interaction paths.</p>
+      </div>
+      <div class="card">
+        <p class="micro">Realtime UI</p>
+        <h3 lang="ru">Интерфейс поверх живой сцены</h3>
+        <h3 lang="en">Interface over a live scene</h3>
+        <p lang="ru">Для интерфейса разработаны собственные realtime-эффекты, включая управляемое размытие фона для сохранения читаемости поверх 3D-сцены.</p>
+        <p lang="en">The interface has its own realtime effects, including a controlled background blur that keeps text readable on top of the 3D scene.</p>
+      </div>
+      <div class="card">
+        <p class="micro">Apartment data</p>
+        <h3 lang="ru">Каталог и 3D-сцена</h3>
+        <h3 lang="en">Catalogue and 3D scene</h3>
+        <p lang="ru">Данные квартир связаны с их представлением в 3D, поэтому фильтрация и выбор работают непосредственно в контексте здания.</p>
+        <p lang="en">Apartment data is bound to its representation in 3D, so filtering and selection happen in the context of the building itself.</p>
+      </div>
+      <div class="card">
+        <p class="micro">Presentation</p>
+        <h3 lang="ru">Контентные сценарии</h3>
+        <h3 lang="en">Content sequences</h3>
+        <p lang="ru">Отдельная логика управляет последовательностями, прогрессом и переходами внутри презентационных режимов.</p>
+        <p lang="en">Separate logic drives the sequences, their progress and the transitions inside the presentation modes.</p>
+      </div>
+      <div class="card">
+        <p class="micro">Development tools</p>
+        <h3 lang="ru">Автоматизация редактора</h3>
+        <h3 lang="en">Editor automation</h3>
+        <p lang="ru">Внутренние инструменты автоматизируют повторяемые проверки, захваты, замеры и часть повседневной работы в Unreal Editor.</p>
+        <p lang="en">In-house tools automate the repeatable checks, captures, measurements and part of the day-to-day work inside Unreal Editor.</p>
+      </div>
+      <div class="card">
+        <p class="micro">Design system</p>
+        <h3 lang="ru">Дизайн-система в коде</h3>
+        <h3 lang="en">Design system in code</h3>
+        <p lang="ru">Палитра, типографика, сетка и ключевые параметры анимаций заданы централизованно. Страница кейса использует ту же визуальную основу, что и приложение.</p>
+        <p lang="en">Palette, typography, grid and the key animation values are declared in one place. This case study page runs on the same visual foundation as the application.</p>
+      </div>
+    </div>
+
+    <div class="stack rise" style="margin-top:40px">
+      <p lang="ru">Дизайн-система построена на двух типографических регистрах: крупном дисплейном с отрицательным трекингом и микро-регистре 12–15 пикселей прописными с трекингом 0.16–0.44 em. Палитра ограничена почти чёрным, тёплым белым и золотым акцентом; дополнительные уровни иерархии формируются прозрачностью.</p>
+      <p lang="en">The design system runs on two typographic registers and nothing in between: a large display face with negative tracking, and a micro register at 12–15 px, uppercase, tracked 0.16–0.44 em. The palette is limited to near-black, warm white and a single gold accent; further levels of hierarchy come from opacity.</p>
+      <p lang="ru">Сцена использует Nanite, Lumen, PCG и потоковую загрузку уровней. Дополнительная runtime-логика подготавливает необходимые данные и системы до того, как раздел становится доступен пользователю, чтобы технические переходы не вмешивались в основной сценарий.</p>
+      <p lang="en">The scene uses Nanite, Lumen, PCG and level streaming. Additional runtime logic prepares the data and systems a section needs before that section becomes available, so the technical transitions stay out of the way of the experience.</p>
+    </div>
+  </section>
+
+  <section id="perf">
+    <div class="head rise">
+      <p class="micro"><span lang="ru">04 · Оптимизация</span><span lang="en">04 · Performance</span></p>
+      <h2 lang="ru">Оптимизация: от 12 FPS до целевых 60+</h2>
+      <h2 lang="en">Optimisation: from 12 FPS to a 60+ target</h2>
+      <p class="lede" lang="ru">Первый собранный билд в наиболее тяжёлых разделах работал примерно на 12 FPS. Следующие шесть недель ушли на профилирование и системную оптимизацию рендеринга, геометрии, текстур и поведения приложения в реальном времени.</p>
+      <p class="lede" lang="en">The first packaged build ran at roughly 12 FPS in its heaviest sections. The next six weeks went into profiling and systematic work on rendering, geometry, textures and the application&rsquo;s realtime behaviour.</p>
+    </div>
+
+    <div class="hero-stat rise">
+      <span class="num" style="color:var(--cool)">12.0</span>
+      <span class="arrow">→</span>
+      <span class="num">65.6</span>
+      <p class="note" lang="ru">Средний FPS в разделе «Зоны». За тот же период 1% low вырос с 5.9 до 50.9 FPS, что заметно улучшило устойчивость времени кадра и субъективную плавность.</p>
+      <p class="note" lang="en">Average FPS in the Amenities section. Over the same period the 1% low went from 5.9 to 50.9 FPS, which is what actually steadied the frame time and the feel of the camera.</p>
+    </div>
+
+    <div class="charts rise">
+      <div class="panel">
+        <div class="panel-head">
+          <p class="micro"><span lang="ru">Средний FPS</span><span lang="en">Average FPS</span></p>
+          <div class="legend">
+            <span><i class="swatch sw-before"></i><span lang="ru">Было</span><span lang="en">Before</span></span>
+            <span><i class="swatch sw-after"></i><span lang="ru">Стало</span><span lang="en">After</span></span>
+          </div>
+        </div>
+        <div class="db" data-chart>
+          __ROWS_AVG__
+        </div>
+        <div class="axis">
+          <div class="axis-scale"><i style="--x:0%">0</i><i style="--x:28.6%">20</i><i style="--x:57.1%">40</i><i style="--x:85.7%">60</i></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <p class="micro">1% low</p>
+          <div class="legend">
+            <span><i class="swatch sw-before"></i><span lang="ru">Было</span><span lang="en">Before</span></span>
+            <span><i class="swatch sw-after"></i><span lang="ru">Стало</span><span lang="en">After</span></span>
+          </div>
+        </div>
+        <div class="db" data-chart>
+          __ROWS_LOW__
+        </div>
+        <div class="axis">
+          <div class="axis-scale"><i style="--x:0%">0</i><i style="--x:28.6%">20</i><i style="--x:57.1%">40</i><i style="--x:85.7%">60</i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroller rise">
+      <table>
+        <caption><span lang="ru">Замер: окно 12 секунд на раздел, одна машина, одинаковый сценарий. Пунктир на графиках — отметка 60 fps.</span><span lang="en">Measured over a 12-second window per section, one machine, the same scenario. The dashed line on the charts marks 60 fps.</span></caption>
+        <thead>
+          <tr><th scope="col"><span lang="ru">Раздел</span><span lang="en">Section</span></th><th scope="col"><span lang="ru">Avg было</span><span lang="en">Avg before</span></th><th scope="col"><span lang="ru">Avg стало</span><span lang="en">Avg after</span></th><th scope="col">Δ</th><th scope="col"><span lang="ru">1% low было</span><span lang="en">1% low before</span></th><th scope="col"><span lang="ru">1% low стало</span><span lang="en">1% low after</span></th><th scope="col">Δ</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row"><span lang="ru">Зоны</span><span lang="en">Amenities</span></th><td>12.0</td><td class="after">65.6</td><td class="delta">+447%</td><td>5.9</td><td class="after">50.9</td><td class="delta">+763%</td></tr>
+          <tr><th scope="row"><span lang="ru">Поиск квартир</span><span lang="en">Apartments</span></th><td>12.4</td><td class="after">65.4</td><td class="delta">+427%</td><td>8.0</td><td class="after">50.3</td><td class="delta">+529%</td></tr>
+          <tr><th scope="row"><span lang="ru">Фильм</span><span lang="en">Film</span></th><td>20.3</td><td class="after">65.4</td><td class="delta">+222%</td><td>16.1</td><td class="after">45.3</td><td class="delta">+181%</td></tr>
+          <tr><th scope="row"><span lang="ru">Главное меню</span><span lang="en">Main menu</span></th><td>20.4</td><td class="after">64.5</td><td class="delta">+216%</td><td>14.6</td><td class="after">41.7</td><td class="delta">+186%</td></tr>
+          <tr><th scope="row"><span lang="ru">Прогулка</span><span lang="en">Walkthrough</span></th><td>49.4</td><td class="after">65.6</td><td class="delta">+33%</td><td>31.6</td><td class="after">47.8</td><td class="delta">+51%</td></tr>
+          <tr><th scope="row"><span lang="ru">Карта</span><span lang="en">Map</span></th><td>49.5</td><td class="after">57.0</td><td class="delta">+15%</td><td>32.7</td><td class="after">41.8</td><td class="delta">+28%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="stack rise" style="margin-top:44px">
+      <h3 lang="ru">Основные направления оптимизации</h3>
+      <h3 lang="en">Where the time went</h3>
+      <p lang="ru"><strong>Рендеринг.</strong> По результатам профилирования пересмотрены наиболее дорогие realtime-настройки сцены и финальная конфигурация рендеринга.</p>
+      <p lang="en"><strong>Rendering.</strong> Profiling drove a review of the most expensive realtime settings in the scene and of the final render configuration.</p>
+      <p lang="ru"><strong>Геометрия.</strong> Оптимизированы тяжёлые меши, уровни детализации и материальные секции; проблемные ассеты приведены к более предсказуемому бюджету.</p>
+      <p lang="en"><strong>Geometry.</strong> Heavy meshes, levels of detail and material sections were optimised; the problem assets were brought back to a more predictable budget.</p>
+      <p lang="ru"><strong>Текстуры.</strong> Пересмотрены избыточные разрешения и бюджет стриминга, чтобы снизить нагрузку и уменьшить заметные подгрузки во время движения камеры.</p>
+      <p lang="en"><strong>Textures.</strong> Excess resolutions and the streaming budget were revisited to cut the load and reduce visible pop-in while the camera moves.</p>
+      <p lang="ru"><strong>Стабильность изображения.</strong> Подобрана финальная конфигурация сглаживания и апскейлинга для более стабильного изображения в движении.</p>
+      <p lang="en"><strong>Image stability.</strong> A final anti-aliasing and upscaling configuration was settled on, for a steadier image in motion.</p>
+      <p lang="ru"><strong>Кадровый ритм.</strong> Поведение приложения настроено так, чтобы переходы и анимации воспроизводились предсказуемо на машинах разной производительности.</p>
+      <p lang="en"><strong>Frame pacing.</strong> The application was tuned so transitions and animations play back predictably on machines of different capability.</p>
+    </div>
+  </section>
+
+  <section id="tools">
+    <div class="head rise">
+      <p class="micro"><span lang="ru">05 · Инструменты</span><span lang="en">05 · Tooling</span></p>
+      <h2 lang="ru">Автоматизация повторяемых проверок</h2>
+      <h2 lang="en">Automating the checks that repeat</h2>
+      <p class="lede" lang="ru">Значительная часть повторяемых операций и проверок была автоматизирована: 168 скриптов на Python и PowerShell, около 11 800 строк. Это использовалось для работы с ассетами, воспроизводимых захватов, проверки UI, замеров производительности и рендера.</p>
+      <p class="lede" lang="en">A large share of the repeatable work was automated: 168 Python and PowerShell scripts, around 11,800 lines. They cover asset work, reproducible captures, UI verification, performance measurement and rendering.</p>
+    </div>
+    <div class="cards rise">
+      <div class="card">
+        <p class="micro"><span lang="ru">Пакетная работа с ассетами</span><span lang="en">Batch asset work</span></p>
+        <p lang="ru">Пакетная подготовка и проверка ассетов, оптимизация геометрии, верификация сцены и автоматизация повторяемых операций.</p>
+        <p lang="en">Batch preparation and checking of assets, geometry optimisation, scene verification and the automation of operations that repeat.</p>
+      </div>
+      <div class="card">
+        <p class="micro"><span lang="ru">Воспроизводимый захват UI</span><span lang="en">Reproducible UI capture</span></p>
+        <p lang="ru">Приложение можно автоматически переводить в заданные состояния и получать воспроизводимые чистые захваты игрового вьюпорта для проверки интерфейса и подготовки материалов.</p>
+        <p lang="en">The application can be driven into given states automatically and produce clean, repeatable captures of the game viewport — for checking the interface and for preparing material.</p>
+      </div>
+      <div class="card">
+        <p class="micro"><span lang="ru">Сверка с прототипом</span><span lang="en">Diff against the prototype</span></p>
+        <p lang="ru">Реализация сравнивается с эталонным макетом попиксельно, с картой различий и численными метриками. Это позволяет находить расхождения на этапе внутренней проверки.</p>
+        <p lang="en">The implementation is compared against the reference mockup pixel by pixel, with a difference map and numeric metrics — so drift is caught during internal review.</p>
+      </div>
+      <div class="card">
+        <p class="micro"><span lang="ru">Замер производительности</span><span lang="en">Performance measurement</span></p>
+        <p lang="ru">Автоматизированный прогон по основным разделам собирает сопоставимые метрики производительности, включая средний FPS и показатели стабильности времени кадра.</p>
+        <p lang="en">An automated pass across the main sections collects comparable performance metrics, including average FPS and frame-time stability.</p>
+      </div>
+      <div class="card">
+        <p class="micro"><span lang="ru">Кинематографический рендер</span><span lang="en">Cinematic rendering</span></p>
+        <p lang="ru">Автоматизация Movie Render Queue позволяет получать повторяемые рендеры ключевых состояний и последовательностей приложения.</p>
+        <p lang="en">Movie Render Queue automation produces repeatable renders of the key states and sequences in the application.</p>
+      </div>
+      <div class="card">
+        <p class="micro"><span lang="ru">Живая правка кода</span><span lang="en">Live coding</span></p>
+        <p lang="ru">Часть C++-итераций и проверок автоматизирована, чтобы сокращать цикл между изменением кода и проверкой результата в редакторе.</p>
+        <p lang="en">Part of the C++ iteration and verification is automated, to shorten the loop between changing code and seeing the result in the editor.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="identity">
+    <div class="head rise">
+      <p class="micro"><span lang="ru">06 · Идентичность</span><span lang="en">06 · Identity</span></p>
+      <h2 lang="ru">Заставка и звук сгенерированы кодом, а не собраны на таймлайне</h2>
+      <h2 lang="en">The intro and its sound are generated by code, not assembled on a timeline</h2>
+      <p class="lede" lang="ru">У приложения есть собственная заставка и звуковой язык интерфейса. И то и другое сделано как процедурная система на Python: анимация и аудио выводятся из одной физической симуляции, а не подгоняются друг под друга вручную.</p>
+      <p class="lede" lang="en">The application has its own intro and its own UI sound language. Both are built as a procedural system in Python: the animation and the audio are derived from one physics simulation rather than fitted to each other by hand.</p>
+    </div>
+
+    <div class="twoup rise" style="margin-bottom: clamp(36px, 5vw, 56px)">
+      <figure class="part-figure">
+        <div class="filmstrip">
+          <video controls preload="none" playsinline poster="__POSTER_intro__">
+            <source src="media/intro.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption lang="ru">Знак Whila · 1920×1080 · 60 fps · со звуком</figcaption>
+        <figcaption lang="en">The Whila symbol · 1920×1080 · 60 fps · with sound</figcaption>
+      </figure>
+      <figure class="part-figure">
+        <div class="filmstrip">
+          <video controls preload="none" playsinline poster="__POSTER_danis__">
+            <source src="media/intro-danis.mp4" type="video/mp4">
+          </video>
+        </div>
+        <figcaption lang="ru">Тот же пайплайн, другой знак · со звуком</figcaption>
+        <figcaption lang="en">Same pipeline, a different mark · with sound</figcaption>
+      </figure>
+    </div>
+
+    <div class="stack rise" style="margin-bottom: clamp(32px, 4vw, 48px)">
+      <p lang="ru">Векторный знак превращается в поле: из SVG считаются альфа-маска, SDF и внутренние координаты, по которым расставляются целевые точки. Частицы стартуют из глубины кадра и сходятся в форму — знак не проявляется фейдом, а собирается. Их количество задаётся параметром: компактному символу хватает девятисот пятидесяти, широкому пятибуквенному начертанию нужно заметно больше, иначе буквы рассыпаются.</p>
+      <p lang="en">The vector mark is turned into a field: an alpha mask, an SDF and interior coordinates are computed from the SVG, and target positions are distributed across them. Particles start from the depth of the frame and converge into the shape — the mark does not fade in, it assembles. Their count is a parameter: 950 is enough for a compact symbol, while a wide five-letter wordmark needs considerably more before the letters stop falling apart.</p>
+      <p lang="ru">Звук берётся из той же симуляции. Кинетическая энергия частиц управляет плотностью и яркостью гранул, схождение сужает стереополе, данные о глубине задают панораму. В момент, когда знак становится читаемым, короткий буфер аудио захватывается и уходит в затухающий хвост — <strong>freeze-decay</strong>. Поэтому звук не «подложен под картинку»: он описывает то же событие.</p>
+      <p lang="en">The sound comes out of that same simulation. The kinetic energy of the particles drives grain density and brightness, convergence narrows the stereo field, and depth data drives the panning. At the moment the mark becomes readable, a short audio buffer is captured and left to decay — a <strong>freeze-decay</strong> tail. The audio is not laid under the picture: it describes the same event.</p>
+      <p lang="ru">Рендер детерминированный — один и тот же <code>--seed</code> даёт один и тот же кадр и одну и ту же волну. Сборка упакована отдельным пакетом с манифестом и запускается одной командой, а знак передаётся параметром: это инструмент под любую айдентику, а не одна готовая анимация.</p>
+      <p lang="en">The render is deterministic — the same <code>--seed</code> yields the same frame and the same waveform. The build sits in its own package with a manifest and runs from a single command, and the mark is passed in as a parameter: a tool for any identity, not one finished animation.</p>
+    </div>
+
+    <div class="rise" style="margin-bottom: clamp(32px, 4vw, 48px)">
+      <h3 style="margin-bottom:16px" lang="ru">Пак интерфейсных звуков — можно послушать</h3>
+      <h3 style="margin-bottom:16px" lang="en">The UI sound pack — you can listen to it</h3>
+      <div class="sndboard">
+          __SOUNDS__
+      </div>
+      <p class="sndboard-note" lang="ru">Нажмите на любой. Золотой меткой отмечены звуки, в которых слышен тот же freeze-хвост, что и в заставке: подтверждение, включение переключателя, открытие панели и фиксация знака. Наведение и нажатие оставлены нарочито голыми — их слышно чаще всего, и характер в них быстро надоедает.</p>
+      <p class="sndboard-note" lang="en">Press any of them. The gold marker sits on the sounds carrying the same freeze tail as the intro: confirm, toggle on, panel open and logo lock. Hover and press are deliberately bare — they fire most often, and character in them gets tiring fast.</p>
+    </div>
+
+    <div class="cards rise">
+      <div class="card">
+        <p class="micro"><span lang="ru">SVG → частицы</span><span lang="en">SVG → particles</span></p>
+        <h3 lang="ru">Форма как цель симуляции</h3>
+        <h3 lang="en">The shape as the simulation target</h3>
+        <p lang="ru">Знак разбирается в SDF-поле, частицы получают целевые позиции внутри формы и физически сходятся к ним. Никакого покадрового кейфрейминга.</p>
+        <p lang="en">The mark is decomposed into an SDF field; particles are given target positions inside the shape and converge on them under simulated physics. No frame-by-frame keyframing.</p>
+      </div>
+      <div class="card">
+        <p class="micro">Granular audio</p>
+        <h3 lang="ru">Звук из метрик движения</h3>
+        <h3 lang="en">Sound from motion metrics</h3>
+        <p lang="ru">Референс режется на микрогранулы и пересобирается под поведение частиц: прибытия, энергия, схождение и пространственная панорама.</p>
+        <p lang="en">A reference fragment is cut into micro-grains and reassembled against the particle behaviour: arrivals, energy, convergence and spatial panning.</p>
+      </div>
+      <div class="card">
+        <p class="micro">UI sound pack</p>
+        <h3 lang="ru">Три слоя на событие</h3>
+        <h3 lang="en">Three layers per event</h3>
+        <p lang="ru">Короткий физический транзиент контакта, тихое цифровое тело и хвост-фиксация — там, где он оправдан. Не в каждом звуке есть все три.</p>
+        <p lang="en">A short physical contact transient, a quiet digital body, and the freeze tail where it is earned. Not every sound carries all three.</p>
+      </div>
+      <div class="card">
+        <p class="micro"><span lang="ru">Слои и сдержанность</span><span lang="en">Layers and restraint</span></p>
+        <h3 lang="ru">Где подпись слышна</h3>
+        <h3 lang="en">Where the signature is audible</h3>
+        <p lang="ru">Характерный хвост оставлен только в confirm, toggle on, открытии панели и фиксации знака. Hover и press держатся минимальными, чтобы интерфейс не утомлял.</p>
+        <p lang="en">The signature tail is kept only in confirm, toggle on, panel open and logo lock. Hover and press stay minimal, so the interface does not wear on you.</p>
+      </div>
+      <div class="card">
+        <p class="micro"><span lang="ru">Чего нет в v1</span><span lang="en">Left out of v1</span></p>
+        <h3 lang="ru">Отказ от лишнего</h3>
+        <h3 lang="en">What was deliberately dropped</h3>
+        <p lang="ru">Звуки ошибок и лупы загрузки намеренно не вошли: они быстро делают набор навязчивым и «игровым», а нужный тон — тише и дороже.</p>
+        <p lang="en">Error sounds and loading loops were left out on purpose: they are the fastest way to make a pack nagging and game-like, and the tone this product needs is quieter than that.</p>
+      </div>
+      <div class="card">
+        <p class="micro"><span lang="ru">Воспроизводимость</span><span lang="en">Reproducibility</span></p>
+        <h3>48 kHz · seed · manifest</h3>
+        <p lang="ru">Стерео PCM16 под импорт в Unreal, детерминированные сиды, манифесты с peak/RMS и превью-монтажи для быстрого прослушивания.</p>
+        <p lang="en">Stereo PCM16 for import into Unreal, deterministic seeds, manifests carrying peak/RMS, and preview montages for fast listening.</p>
+      </div>
+    </div>
+
+    <p class="stack rise" style="margin-top: clamp(28px, 3.5vw, 40px); color: var(--text-3); font-size: 15px;"><span lang="ru">Два ролика выше собраны одной и той же сборкой — менялся только SVG на входе и число частиц под сложность формы. Знак Whila принадлежит компании; метод, код и звук — мои.</span><span lang="en">Both clips above came out of the same build — only the input SVG changed, and the particle count with it. The Whila symbol belongs to the company; the method, the code and the sound are mine.</span></p>
+  </section>
+
+  <section id="timeline">
+    <div class="head rise">
+      <p class="micro"><span lang="ru">07 · Хронология</span><span lang="en">07 · Timeline</span></p>
+      <h2 lang="ru">От первой сборки к собственной платформе</h2>
+      <h2 lang="en">From a first build to a platform of its own</h2>
+      <p class="lede" lang="ru">Проект развивался итеративно: быстрый MVP позволил проверить формат, после чего решение было пересобрано как самостоятельное realtime-приложение. Текущая версия остаётся R&amp;D-проектом — новые продуктовые и технические решения проходят проверку непосредственно в рабочей сборке.</p>
+      <p class="lede" lang="en">The project grew iteratively: a quick MVP tested the format, after which the whole thing was rebuilt as a standalone realtime application. The current version remains R&amp;D — new product and technical decisions are tried directly in the working build.</p>
+    </div>
+    <div class="phases rise">
+      <div class="phase">
+        <div class="phase-when"><b>Foundation</b><span class="micro">MVP</span></div>
+        <p lang="ru">Подготовка архитектурной сцены, первая упакованная сборка и базовые сценарии взаимодействия. MVP был собран на готовых шаблонах и помог быстро проверить идею цифрового шоурума.</p>
+        <p lang="en">Preparing the architectural scene, a first packaged build and the basic interaction paths. The MVP sat on off-the-shelf templates and answered the question of whether a digital showroom was worth building.</p>
+      </div>
+      <div class="phase">
+        <div class="phase-when"><b>Product systems</b><span class="micro"><span lang="ru">Платформа</span><span lang="en">Platform</span></span></div>
+        <p lang="ru">Переход от прототипа к собственной архитектуре приложения: навигация и машина состояний, карта, зоны, поиск квартир, режим фильма и Pixel Streaming.</p>
+        <p lang="en">Moving from prototype to an application architecture of its own: navigation and the state machine, the map, the amenities, the apartment search, the film mode and Pixel Streaming.</p>
+      </div>
+      <div class="phase">
+        <div class="phase-when"><b>UI &amp; interaction</b><span class="micro"><span lang="ru">Новая версия</span><span lang="en">New version</span></span></div>
+        <p lang="ru">Полная переработка интерфейса: собственная дизайн-система, Slate UI, переходы между разделами, realtime-эффекты, локализация и звуковое оформление.</p>
+        <p lang="en">A full rework of the interface: an in-house design system, Slate UI, transitions between sections, realtime effects, localisation and sound.</p>
+      </div>
+      <div class="phase">
+        <div class="phase-when"><b>Optimization</b><span class="micro"><span lang="ru">6 недель</span><span lang="en">6 weeks</span></span></div>
+        <p lang="ru">Отдельный цикл профилирования и оптимизации рендеринга, геометрии, текстур, ассетов и памяти — с контролем времени кадра в целевых сценариях.</p>
+        <p lang="en">A dedicated cycle of profiling and optimisation across rendering, geometry, textures, assets and memory — with frame time watched in the target scenarios.</p>
+      </div>
+      <div class="phase">
+        <div class="phase-when"><b>Current R&amp;D</b><span class="micro"><span lang="ru">Сейчас</span><span lang="en">Now</span></span></div>
+        <p lang="ru">Развитие собственных C++-плагинов и редакторских инструментов, доводка игровой и визуальной логики, QA, упаковка и проверка новых решений в рабочем продукте.</p>
+        <p lang="en">Growing the in-house C++ plugins and editor tooling, refining the gameplay and visual logic, QA, packaging, and testing new ideas inside the working product.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="role">
+    <div class="head rise">
+      <p class="micro"><span lang="ru">08 · Роль</span><span lang="en">08 · Role</span></p>
+      <h2 lang="ru">Моя роль и зона ответственности</h2>
+      <h2 lang="en">My role and what I was responsible for</h2>
+      <p class="lede" lang="ru">Соло-проект: ниже фактическая зона ответственности по техническому арту, разработке, дизайну и продакшну. Исходная архитектурная модель и часть статичных визуализаций предоставлены Whila и не относятся к моему авторству.</p>
+      <p class="lede" lang="en">A solo project. Below is the actual scope across technical art, development, design and production. The source architectural model and part of the static visualisations were provided by Whila and are not my authorship.</p>
+    </div>
+    <div class="roles rise">
+      <div class="role">
+        <p class="micro"><span lang="ru">Технический арт</span><span lang="en">Technical art</span></p>
+        <ul lang="ru">
+          <li>Экспорт предоставленной модели из 3ds Max и подготовка для Unreal Engine</li>
+          <li>Уровень, материалы, коллизии</li>
+          <li>Свет и настройка realtime rendering</li>
+          <li>Растительность и раскладка через PCG</li>
+          <li>LOD-ы и оптимизация геометрии</li>
+        </ul>
+        <ul lang="en">
+          <li>Exporting the supplied model from 3ds Max and preparing it for Unreal Engine</li>
+          <li>Level, materials, collision</li>
+          <li>Lighting and realtime rendering setup</li>
+          <li>Vegetation and scatter through PCG</li>
+          <li>LODs and geometry optimisation</li>
+        </ul>
+      </div>
+      <div class="role">
+        <p class="micro"><span lang="ru">Разработка</span><span lang="en">Development</span></p>
+        <ul lang="ru">
+          <li>Пять плагинов на C++, ~44 000 строк</li>
+          <li>Весь интерфейс на Slate</li>
+          <li>Машина состояний разделов и переходов</li>
+          <li>Собственные realtime UI-эффекты</li>
+          <li>Инструментарий редактора на Python</li>
+        </ul>
+        <ul lang="en">
+          <li>Five C++ plugins, ~44,000 lines</li>
+          <li>The entire interface in Slate</li>
+          <li>State machine for sections and transitions</li>
+          <li>In-house realtime UI effects</li>
+          <li>Editor tooling in Python</li>
+        </ul>
+      </div>
+      <div class="role">
+        <p class="micro"><span lang="ru">Дизайн</span><span lang="en">Design</span></p>
+        <ul lang="ru">
+          <li>UX пяти разделов и навигации</li>
+          <li>Дизайн-система: палитра, типографика, сетка</li>
+          <li>Тайминги и характер анимаций</li>
+          <li>Локализация RU / EN</li>
+          <li>Процедурная заставка и звуковой язык интерфейса</li>
+        </ul>
+        <ul lang="en">
+          <li>UX of the five sections and the navigation</li>
+          <li>Design system: palette, typography, grid</li>
+          <li>Animation timings and character</li>
+          <li>RU / EN localisation</li>
+          <li>Procedural intro and the UI sound language</li>
+        </ul>
+      </div>
+      <div class="role">
+        <p class="micro"><span lang="ru">Продакшн</span><span lang="en">Production</span></p>
+        <ul lang="ru">
+          <li>Планирование и ведение задач</li>
+          <li>Кинематографический рендер через MRQ</li>
+          <li>Упаковка десктоп-билда</li>
+          <li>Развёртывание через Pixel Streaming</li>
+          <li>Замеры и отчётность по производительности</li>
+        </ul>
+        <ul lang="en">
+          <li>Planning and task tracking</li>
+          <li>Cinematic rendering through MRQ</li>
+          <li>Packaging the desktop build</li>
+          <li>Pixel Streaming setup</li>
+          <li>Performance measurement and reporting</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="sign">
+    <div>
+      <p class="micro" style="margin-bottom:16px"><span lang="ru">Проект</span><span lang="en">Project</span></p>
+      <h2 lang="ru">Digital Showroom<br>Цифровой шоурум недвижимости</h2>
+      <h2 lang="en">Digital Showroom<br>Interactive Real Estate Experience</h2>
+    </div>
+    <div class="sign-meta">
+      <span class="micro"><span lang="ru">Автор</span><span lang="en">Author</span></span>
+      <b style="font-family:var(--body);font-weight:500;font-size:17px;color:var(--bright)"><span lang="ru">Данис Зиакаев</span><span lang="en">Danis Ziakaev</span></b>
+      <span class="micro" style="letter-spacing:0.1em;text-transform:none;font-size:13px;color:var(--text-3)">Unreal Engine developer · solo design &amp; development</span>
+      <a href="mailto:ziakaev.danis@gmail.com" class="micro" style="letter-spacing:0.1em;text-transform:none;font-size:13px;margin-top:8px;color:var(--gold)">ziakaev.danis@gmail.com</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // --- Language toggle ----------------------------------------------------
+  // The choice is written back into the URL so the address bar always holds a
+  // shareable link to the version on screen, and remembered for the next visit.
+  var langButtons = [].slice.call(document.querySelectorAll("[data-set-lang]"));
+
+  // A document has one <title>, so it is swapped rather than duplicated. The
+  // product name stays as it is in both — it is the name, and it matches what
+  // the application itself shows in its header.
+  var TITLES = {
+    ru: "Digital Showroom — цифровой шоурум недвижимости",
+    en: "Digital Showroom — Interactive Real Estate Experience"
+  };
+
+  // An <img> carries one alt, so the English wording rides along in a data
+  // attribute and the Russian original is stashed on first switch.
+  var alted = [].slice.call(document.querySelectorAll("img[data-alt-en]"));
+  alted.forEach(function (img) { img.dataset.altRu = img.alt; });
+
+  function applyLang(next) {
+    root.setAttribute("data-lang", next);
+    root.lang = next;
+    document.title = TITLES[next];
+    alted.forEach(function (img) {
+      img.alt = next === "en" ? img.dataset.altEn : img.dataset.altRu;
+    });
+    langButtons.forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.setLang === next));
+    });
+    try { localStorage.setItem("ds-lang", next); } catch (e) { /* storage blocked */ }
+    if (window.history && history.replaceState) {
+      var url = new URL(location.href);
+      url.searchParams.set("lang", next);
+      history.replaceState(null, "", url);
+    }
+  }
+
+  applyLang(root.getAttribute("data-lang") === "en" ? "en" : "ru");
+  langButtons.forEach(function (b) {
+    b.addEventListener("click", function () { applyLang(b.dataset.setLang); });
+  });
+
+  // --- Hero menu playback -------------------------------------------------
+  // Blades autoplay by attribute, so the menu is alive even with JS off, and
+  // every blade keeps playing the whole time it is on screen. Hover is handled
+  // entirely in CSS — width and brightness. The only thing JS does here is
+  // stop the decoding once the menu has scrolled away, because five
+  // simultaneous 1080-tall clips should not run for a reader who is four
+  // sections further down the page.
+  var menu = document.querySelector(".menu-live");
+  var clips = menu ? [].slice.call(menu.querySelectorAll("video")) : [];
+  var menuObserver = null;
+
+  function setMenuPlaying(on) {
+    clips.forEach(function (clip) {
+      if (on === !clip.paused) return;
+      if (on) {
+        var p = clip.play();
+        if (p && p.catch) p.catch(function () { /* policy or teardown */ });
+      } else {
+        clip.pause();
+      }
+    });
+  }
+
+  if (reduce) {
+    // Freeze on the poster frames when the visitor asks for less motion.
+    clips.forEach(function (clip) { clip.removeAttribute("autoplay"); });
+    setMenuPlaying(false);
+  } else if (clips.length && "IntersectionObserver" in window) {
+    // Held in a variable rather than left anonymous: an observer with a live
+    // observation should survive on its own, but the reference costs nothing.
+    // If this never fires the menu simply keeps playing — the same behaviour
+    // as without the observer at all.
+    menuObserver = new IntersectionObserver(function (entries) {
+      setMenuPlaying(entries[entries.length - 1].isIntersecting);
+    }, { threshold: 0.05 });
+    menuObserver.observe(menu);
+  }
+
+  // Sound board: one Audio per button, built on first press. Only ever one
+  // sound at a time — the pack is meant to be compared, not layered.
+  var playing = null;
+  document.querySelectorAll(".snd").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      if (playing && playing.el !== btn) {
+        playing.audio.pause();
+        playing.el.classList.remove("is-playing");
+      }
+      var audio = btn._audio;
+      if (!audio) {
+        audio = btn._audio = new Audio(btn.dataset.src);
+        audio.addEventListener("ended", function () { btn.classList.remove("is-playing"); });
+      }
+      audio.currentTime = 0;
+      var p = audio.play();
+      if (p && p.catch) p.catch(function () { /* autoplay policy — silent no-op */ });
+      btn.classList.add("is-playing");
+      playing = { el: btn, audio: audio };
+    });
+  });
+
+  if (reduce || !("IntersectionObserver" in window)) return; // page renders finished
+
+  // Opt in to the hidden start state only now that the reveal is guaranteed.
+  root.classList.add("js-anim");
+
+  var targets = document.querySelectorAll(".rise, [data-chart]");
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      e.target.classList.add("in");
+      io.unobserve(e.target);
+    });
+  }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+  targets.forEach(function (el) { io.observe(el); });
+
+  // Safety net: if the observer never fires (offscreen render, print, thumbnail
+  // capture), drop the whole animation layer rather than leave the page blank.
+  setTimeout(function () {
+    if (!document.querySelector(".rise.in")) root.classList.remove("js-anim");
+  }, 2000);
+})();
+</script>
