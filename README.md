@@ -13,7 +13,7 @@ optimisation pass actually moved.
 
 ```
 index.html          built page — do not edit, it is regenerated
-media/              video loops, the walkthrough, poster frames
+media/              video loops and poster frames
 src/
   build.py          the build
   page.tpl.html     the source template
@@ -41,7 +41,8 @@ other.
 ## Why some assets are inlined and some are not
 
 Screenshots, poster frames and the sound pack are embedded as data URIs.
-Videos are referenced from `media/`.
+The full walkthrough is embedded from YouTube; short interface loops and
+identity clips are referenced from `media/`.
 
 The split follows one rule: **the page has to survive being sent as a single
 file.** Detached from `media/`, it still reads end to end — every section shows

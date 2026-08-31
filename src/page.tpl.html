@@ -343,7 +343,8 @@ figcaption { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; 
 /* Full-width player. preload="none" so the hero loops get the bandwidth
    first — the poster carries the block until someone actually presses play. */
 .filmstrip { border: 1px solid var(--edge-sub); background: #000; }
-.filmstrip video { width: 100%; display: block; aspect-ratio: 16 / 9; background: #000; }
+.filmstrip video,
+.filmstrip iframe { width: 100%; display: block; aspect-ratio: 16 / 9; border: 0; background: #000; }
 /* Two players side by side: the same pipeline fed two different marks. Stacked
    below 860px, where a half-width 16:9 video stops being watchable. */
 .twoup { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
@@ -593,12 +594,16 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
     </div>
     <figure class="part-figure rise">
       <div class="filmstrip">
-        <video controls preload="none" playsinline poster="__POSTER_full__">
-          <source src="media/showroom-full.mp4" type="video/mp4">
-        </video>
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/3aA1sz68zMc?rel=0"
+          title="Interactive Real Estate Sales System Demo | Unreal Engine 5"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen></iframe>
       </div>
-      <figcaption lang="ru">Проходка по всем разделам · захват из упакованного Windows-билда · 1:56</figcaption>
-      <figcaption lang="en">Full walkthrough of every section · captured from the packaged Windows build · 1:56</figcaption>
+      <figcaption lang="ru">Проходка по всем разделам · захват из упакованного Windows-билда · 2:04</figcaption>
+      <figcaption lang="en">Full walkthrough of every section · captured from the packaged Windows build · 2:04</figcaption>
     </figure>
   </section>
 
