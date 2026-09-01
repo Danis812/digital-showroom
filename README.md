@@ -65,5 +65,5 @@ renderings derived from it are offered for reuse here.
 
 ## Contact
 
-Danis Ziakaev — Unreal Engine developer
+Danis Ziakaev — Technical Product Designer, real-time 3D
 [ziakaev.danis@gmail.com](mailto:ziakaev.danis@gmail.com)
