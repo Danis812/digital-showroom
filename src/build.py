@@ -124,15 +124,19 @@ def sound_cards():
 
 # --- Performance chart ------------------------------------------------------
 
-MAX = 70.0                      # shared scale for both panels
+MAX = 90.0                      # shared scale for both panels
 REF = 60.0 / MAX * 100.0        # the 60 fps reference line
 
 # 2026-09-27: medians of three 30-second runs per build and section.
-# RTX 4070 Laptop, 1920x1080; see benchmarks/2026-09-27_1080p/README.md.
+# RTX 4070 Laptop, 1920x1080; see benchmarks/2026-09-27_1080p_all_modes/README.md.
 # name RU, name EN, avg before, avg after, 1% low before, 1% low after
 FPS = [
+    ("Главное меню",  "Main menu",   17.89, 46.73, 14.58, 38.71),
+    ("Прогулка",      "Walkthrough", 11.36, 50.09, 7.52, 41.97),
     ("Зоны",          "Amenities",   10.96, 48.65, 6.46, 42.67),
     ("Поиск квартир", "Apartments",  10.04, 56.19, 6.34, 49.11),
+    ("Карта",         "Map",         42.09, 47.05, 33.14, 40.65),
+    ("Film / Галерея*", "Film / Gallery*", 27.82, 77.02, 22.78, 58.73),
 ]
 
 CHART_ROW = (
@@ -193,6 +197,10 @@ def main():
     html = html.replace("__ROWS_AVG__", chart_rows(2, 3))
     html = html.replace("__ROWS_LOW__", chart_rows(4, 5))
     html = html.replace("__ROWS_TABLE__", table_rows())
+    html = html.replace("__AXIS__", "".join(
+        '<i style="--x:%.2f%%">%d</i>' % (value / MAX * 100, value)
+        for value in range(0, int(MAX) + 1, 20)
+    ))
     html = html.replace("__SOUNDS__", sound_cards())
 
     # Case-sensitive on purpose: the image keys are lowercase, and a stricter

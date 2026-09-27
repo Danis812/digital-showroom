@@ -826,10 +826,10 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
   <section id="perf">
     <div class="head rise">
       <p class="micro"><span lang="ru">04 · Оптимизация</span><span lang="en">04 · Performance</span></p>
-      <h2 lang="ru">Оптимизация: примерно в 5 раз быстрее</h2>
-      <h2 lang="en">Optimisation: roughly 5× faster</h2>
-      <p class="lede" lang="ru">Ускорил разделы благоустройства и поиска квартир с 10–11 до 49–56 FPS при 1920×1080 на RTX 4070 Laptop. Шесть недель профилирования и оптимизации охватили рендеринг, геометрию, текстуры, стриминг и настройки сцены. Повторный замер двух билдов подтвердил рост среднего FPS в 4,44–5,60 раза.</p>
-      <p class="lede" lang="en">Improved Amenities and Apartment Search from 10–11 to 49–56 FPS at 1920×1080 on an RTX 4070 Laptop. Six weeks of profiling and optimisation covered rendering, geometry, textures, streaming and scene settings. A fresh benchmark of the two builds confirmed a 4.44–5.60× increase in average FPS.</p>
+      <h2 lang="ru">Оптимизация: до 5,6 раза быстрее</h2>
+      <h2 lang="en">Optimisation: up to 5.6× faster</h2>
+      <p class="lede" lang="ru">Оптимизировал Digital Showroom: до 5,6× выше средний FPS при 1920×1080 на RTX 4070 Laptop. Шесть недель работы охватили рендеринг, геометрию, текстуры, стриминг и настройки сцены. Ниже — результаты пяти разделов и главного меню: по три 30-секундных прогона в исходном и оптимизированном билдах.</p>
+      <p class="lede" lang="en">Optimised Digital Showroom for up to 5.6× higher average FPS at 1920×1080 on an RTX 4070 Laptop. Six weeks of work covered rendering, geometry, textures, streaming and scene settings. Below are results for all five sections and the main menu: three 30-second runs in each of the original and optimised builds.</p>
     </div>
 
     <div class="hero-stat rise">
@@ -850,11 +850,15 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
           </div>
         </div>
         <div class="db" data-chart>
-          <div class="db-row" tabindex="0" style="--a:15.66%;--b:69.50%;--w:53.84%"><span class="db-name"><span lang="ru">Зоны</span><span lang="en">Amenities</span></span><span class="db-num">11.0</span><span class="db-track"><i class="db-ref" style="--ref:85.71%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">48.6</span><span class="db-tip"><span>11.0 &rarr; 48.6 &middot; <b>+344%</b></span></span></div>
-          <div class="db-row" tabindex="0" style="--a:14.34%;--b:80.27%;--w:65.93%"><span class="db-name"><span lang="ru">Поиск квартир</span><span lang="en">Apartments</span></span><span class="db-num">10.0</span><span class="db-track"><i class="db-ref" style="--ref:85.71%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">56.2</span><span class="db-tip"><span>10.0 &rarr; 56.2 &middot; <b>+460%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:19.88%;--b:51.92%;--w:32.04%"><span class="db-name"><span lang="ru">Главное меню</span><span lang="en">Main menu</span></span><span class="db-num">17.9</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">46.7</span><span class="db-tip"><span>17.9 &rarr; 46.7 &middot; <b>+161%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:12.62%;--b:55.66%;--w:43.03%"><span class="db-name"><span lang="ru">Прогулка</span><span lang="en">Walkthrough</span></span><span class="db-num">11.4</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">50.1</span><span class="db-tip"><span>11.4 &rarr; 50.1 &middot; <b>+341%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:12.18%;--b:54.06%;--w:41.88%"><span class="db-name"><span lang="ru">Зоны</span><span lang="en">Amenities</span></span><span class="db-num">11.0</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">48.6</span><span class="db-tip"><span>11.0 &rarr; 48.6 &middot; <b>+344%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:11.16%;--b:62.43%;--w:51.28%"><span class="db-name"><span lang="ru">Поиск квартир</span><span lang="en">Apartments</span></span><span class="db-num">10.0</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">56.2</span><span class="db-tip"><span>10.0 &rarr; 56.2 &middot; <b>+460%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:46.77%;--b:52.28%;--w:5.51%"><span class="db-name"><span lang="ru">Карта</span><span lang="en">Map</span></span><span class="db-num">42.1</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">47.0</span><span class="db-tip"><span>42.1 &rarr; 47.0 &middot; <b>+12%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:30.91%;--b:85.58%;--w:54.67%"><span class="db-name"><span lang="ru">Film / Галерея*</span><span lang="en">Film / Gallery*</span></span><span class="db-num">27.8</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">77.0</span><span class="db-tip"><span>27.8 &rarr; 77.0 &middot; <b>+177%</b></span></span></div>
         </div>
         <div class="axis">
-          <div class="axis-scale"><i style="--x:0%">0</i><i style="--x:28.6%">20</i><i style="--x:57.1%">40</i><i style="--x:85.7%">60</i></div>
+          <div class="axis-scale"><i style="--x:0.00%">0</i><i style="--x:22.22%">20</i><i style="--x:44.44%">40</i><i style="--x:66.67%">60</i><i style="--x:88.89%">80</i></div>
         </div>
       </div>
 
@@ -867,11 +871,15 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
           </div>
         </div>
         <div class="db" data-chart>
-          <div class="db-row" tabindex="0" style="--a:9.23%;--b:60.96%;--w:51.73%"><span class="db-name"><span lang="ru">Зоны</span><span lang="en">Amenities</span></span><span class="db-num">6.5</span><span class="db-track"><i class="db-ref" style="--ref:85.71%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">42.7</span><span class="db-tip"><span>6.5 &rarr; 42.7 &middot; <b>+561%</b></span></span></div>
-          <div class="db-row" tabindex="0" style="--a:9.06%;--b:70.16%;--w:61.10%"><span class="db-name"><span lang="ru">Поиск квартир</span><span lang="en">Apartments</span></span><span class="db-num">6.3</span><span class="db-track"><i class="db-ref" style="--ref:85.71%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">49.1</span><span class="db-tip"><span>6.3 &rarr; 49.1 &middot; <b>+675%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:16.20%;--b:43.01%;--w:26.81%"><span class="db-name"><span lang="ru">Главное меню</span><span lang="en">Main menu</span></span><span class="db-num">14.6</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">38.7</span><span class="db-tip"><span>14.6 &rarr; 38.7 &middot; <b>+166%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:8.36%;--b:46.63%;--w:38.28%"><span class="db-name"><span lang="ru">Прогулка</span><span lang="en">Walkthrough</span></span><span class="db-num">7.5</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">42.0</span><span class="db-tip"><span>7.5 &rarr; 42.0 &middot; <b>+458%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:7.18%;--b:47.41%;--w:40.23%"><span class="db-name"><span lang="ru">Зоны</span><span lang="en">Amenities</span></span><span class="db-num">6.5</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">42.7</span><span class="db-tip"><span>6.5 &rarr; 42.7 &middot; <b>+561%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:7.04%;--b:54.57%;--w:47.52%"><span class="db-name"><span lang="ru">Поиск квартир</span><span lang="en">Apartments</span></span><span class="db-num">6.3</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">49.1</span><span class="db-tip"><span>6.3 &rarr; 49.1 &middot; <b>+675%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:36.82%;--b:45.17%;--w:8.34%"><span class="db-name"><span lang="ru">Карта</span><span lang="en">Map</span></span><span class="db-num">33.1</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">40.6</span><span class="db-tip"><span>33.1 &rarr; 40.6 &middot; <b>+23%</b></span></span></div>
+          <div class="db-row" tabindex="0" style="--a:25.31%;--b:65.26%;--w:39.94%"><span class="db-name"><span lang="ru">Film / Галерея*</span><span lang="en">Film / Gallery*</span></span><span class="db-num">22.8</span><span class="db-track"><i class="db-ref" style="--ref:66.67%"></i><i class="db-line"></i><i class="db-dot is-before"></i><i class="db-dot is-after"></i></span><span class="db-num is-after">58.7</span><span class="db-tip"><span>22.8 &rarr; 58.7 &middot; <b>+158%</b></span></span></div>
         </div>
         <div class="axis">
-          <div class="axis-scale"><i style="--x:0%">0</i><i style="--x:28.6%">20</i><i style="--x:57.1%">40</i><i style="--x:85.7%">60</i></div>
+          <div class="axis-scale"><i style="--x:0.00%">0</i><i style="--x:22.22%">20</i><i style="--x:44.44%">40</i><i style="--x:66.67%">60</i><i style="--x:88.89%">80</i></div>
         </div>
       </div>
     </div>
@@ -883,16 +891,22 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
           <tr><th scope="col"><span lang="ru">Раздел</span><span lang="en">Section</span></th><th scope="col"><span lang="ru">Avg было</span><span lang="en">Avg before</span></th><th scope="col"><span lang="ru">Avg стало</span><span lang="en">Avg after</span></th><th scope="col">×</th><th scope="col"><span lang="ru">1% low было</span><span lang="en">1% low before</span></th><th scope="col"><span lang="ru">1% low стало</span><span lang="en">1% low after</span></th><th scope="col">×</th></tr>
         </thead>
         <tbody>
+          <tr><th scope="row"><span lang="ru">Главное меню</span><span lang="en">Main menu</span></th><td>17.89</td><td class="after">46.73</td><td class="delta">2.61×</td><td>14.58</td><td class="after">38.71</td><td class="delta">2.66×</td></tr>
+          <tr><th scope="row"><span lang="ru">Прогулка</span><span lang="en">Walkthrough</span></th><td>11.36</td><td class="after">50.09</td><td class="delta">4.41×</td><td>7.52</td><td class="after">41.97</td><td class="delta">5.58×</td></tr>
           <tr><th scope="row"><span lang="ru">Зоны</span><span lang="en">Amenities</span></th><td>10.96</td><td class="after">48.65</td><td class="delta">4.44×</td><td>6.46</td><td class="after">42.67</td><td class="delta">6.61×</td></tr>
           <tr><th scope="row"><span lang="ru">Поиск квартир</span><span lang="en">Apartments</span></th><td>10.04</td><td class="after">56.19</td><td class="delta">5.60×</td><td>6.34</td><td class="after">49.11</td><td class="delta">7.75×</td></tr>
+          <tr><th scope="row"><span lang="ru">Карта</span><span lang="en">Map</span></th><td>42.09</td><td class="after">47.05</td><td class="delta">1.12×</td><td>33.14</td><td class="after">40.65</td><td class="delta">1.23×</td></tr>
+          <tr><th scope="row"><span lang="ru">Film / Галерея*</span><span lang="en">Film / Gallery*</span></th><td>27.82</td><td class="after">77.02</td><td class="delta">2.77×</td><td>22.78</td><td class="after">58.73</td><td class="delta">2.58×</td></tr>
         </tbody>
       </table>
     </div>
 
     <div class="stack rise" style="margin-top:24px">
-      <p lang="ru">Замер сравнивает исходный и оптимизированный билды одного проекта. Изменения ассетов и настроек сцены входят в результат оптимизации. Проверены два режима после загрузки; этот результат не является средним по всему приложению.</p>
-      <p lang="en">The benchmark compares the original and optimised builds of the same project. Asset and scene-setting changes are part of the optimisation. Two modes were measured after loading; this is not an application-wide average.</p>
-      <p><a href="https://github.com/Danis812/digital-showroom/blob/main/benchmarks/2026-09-27_1080p/README.md"><span lang="ru">Методика и исходные данные</span><span lang="en">Method and source data</span></a> · <a href="benchmarks/2026-09-27_1080p/results.csv" download><span lang="ru">Все 12 прогонов · CSV</span><span lang="en">All 12 runs · CSV</span></a></p>
+      <p lang="ru">Замер сравнивает исходный и оптимизированный билды одного проекта. Изменения ассетов и настроек сцены входят в результат оптимизации. Проверены состояния после загрузки без пользовательского ввода; 5,6× — максимальный прирост в таблице, а не среднее по приложению.</p>
+      <p lang="en">The benchmark compares the original and optimised builds of the same project. Asset and scene-setting changes are part of the optimisation. Loaded states were measured without user input; 5.6× is the largest gain in the table, not an application-wide average.</p>
+      <p lang="ru">Прогулка — 3D-двор после входа, без движения. Карта в новом билде включает автоматический обзор. Film / Галерея* — разные состояния раздела: статичный экран старой галереи и автоматическая смена глав в новом Film; это не тест воспроизведения одинакового видео.</p>
+      <p lang="en">Walkthrough measures the 3D courtyard after entry, without movement. The current Map includes its automatic tour. Film / Gallery* compares different section states: the original static gallery screen and the current Film's automatic chapter sequence, not playback of identical video.</p>
+      <p><a href="https://github.com/Danis812/digital-showroom/blob/main/benchmarks/2026-09-27_1080p_all_modes/README.md"><span lang="ru">Методика и исходные данные</span><span lang="en">Method and source data</span></a> · <a href="benchmarks/2026-09-27_1080p_all_modes/results.csv" download><span lang="ru">Все 36 прогонов · CSV</span><span lang="en">All 36 runs · CSV</span></a></p>
     </div>
 
     <div class="stack rise" style="margin-top:44px">

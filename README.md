@@ -35,7 +35,7 @@ order and tail markers in `SOUNDS`. Waveforms and durations are measured from
 the WAV files at build time, so changing the pack needs no hand-editing.
 
 The performance charts and table use the same `FPS` data. The current
-[1080p benchmark](benchmarks/2026-09-27_1080p/README.md) includes all 12 runs,
+[1080p benchmark](benchmarks/2026-09-27_1080p_all_modes/README.md) includes all 36 runs across five sections and the menu,
 raw frame intervals and a script to recalculate the results.
 
 The page carries Russian and English side by side, marked `lang="ru"` /

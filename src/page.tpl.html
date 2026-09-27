@@ -826,10 +826,10 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
   <section id="perf">
     <div class="head rise">
       <p class="micro"><span lang="ru">04 · Оптимизация</span><span lang="en">04 · Performance</span></p>
-      <h2 lang="ru">Оптимизация: примерно в 5 раз быстрее</h2>
-      <h2 lang="en">Optimisation: roughly 5× faster</h2>
-      <p class="lede" lang="ru">Ускорил разделы благоустройства и поиска квартир с 10–11 до 49–56 FPS при 1920×1080 на RTX 4070 Laptop. Шесть недель профилирования и оптимизации охватили рендеринг, геометрию, текстуры, стриминг и настройки сцены. Повторный замер двух билдов подтвердил рост среднего FPS в 4,44–5,60 раза.</p>
-      <p class="lede" lang="en">Improved Amenities and Apartment Search from 10–11 to 49–56 FPS at 1920×1080 on an RTX 4070 Laptop. Six weeks of profiling and optimisation covered rendering, geometry, textures, streaming and scene settings. A fresh benchmark of the two builds confirmed a 4.44–5.60× increase in average FPS.</p>
+      <h2 lang="ru">Оптимизация: до 5,6 раза быстрее</h2>
+      <h2 lang="en">Optimisation: up to 5.6× faster</h2>
+      <p class="lede" lang="ru">Оптимизировал Digital Showroom: до 5,6× выше средний FPS при 1920×1080 на RTX 4070 Laptop. Шесть недель работы охватили рендеринг, геометрию, текстуры, стриминг и настройки сцены. Ниже — результаты пяти разделов и главного меню: по три 30-секундных прогона в исходном и оптимизированном билдах.</p>
+      <p class="lede" lang="en">Optimised Digital Showroom for up to 5.6× higher average FPS at 1920×1080 on an RTX 4070 Laptop. Six weeks of work covered rendering, geometry, textures, streaming and scene settings. Below are results for all five sections and the main menu: three 30-second runs in each of the original and optimised builds.</p>
     </div>
 
     <div class="hero-stat rise">
@@ -853,7 +853,7 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
           __ROWS_AVG__
         </div>
         <div class="axis">
-          <div class="axis-scale"><i style="--x:0%">0</i><i style="--x:28.6%">20</i><i style="--x:57.1%">40</i><i style="--x:85.7%">60</i></div>
+          <div class="axis-scale">__AXIS__</div>
         </div>
       </div>
 
@@ -869,7 +869,7 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
           __ROWS_LOW__
         </div>
         <div class="axis">
-          <div class="axis-scale"><i style="--x:0%">0</i><i style="--x:28.6%">20</i><i style="--x:57.1%">40</i><i style="--x:85.7%">60</i></div>
+          <div class="axis-scale">__AXIS__</div>
         </div>
       </div>
     </div>
@@ -887,9 +887,11 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
     </div>
 
     <div class="stack rise" style="margin-top:24px">
-      <p lang="ru">Замер сравнивает исходный и оптимизированный билды одного проекта. Изменения ассетов и настроек сцены входят в результат оптимизации. Проверены два режима после загрузки; этот результат не является средним по всему приложению.</p>
-      <p lang="en">The benchmark compares the original and optimised builds of the same project. Asset and scene-setting changes are part of the optimisation. Two modes were measured after loading; this is not an application-wide average.</p>
-      <p><a href="https://github.com/Danis812/digital-showroom/blob/main/benchmarks/2026-09-27_1080p/README.md"><span lang="ru">Методика и исходные данные</span><span lang="en">Method and source data</span></a> · <a href="benchmarks/2026-09-27_1080p/results.csv" download><span lang="ru">Все 12 прогонов · CSV</span><span lang="en">All 12 runs · CSV</span></a></p>
+      <p lang="ru">Замер сравнивает исходный и оптимизированный билды одного проекта. Изменения ассетов и настроек сцены входят в результат оптимизации. Проверены состояния после загрузки без пользовательского ввода; 5,6× — максимальный прирост в таблице, а не среднее по приложению.</p>
+      <p lang="en">The benchmark compares the original and optimised builds of the same project. Asset and scene-setting changes are part of the optimisation. Loaded states were measured without user input; 5.6× is the largest gain in the table, not an application-wide average.</p>
+      <p lang="ru">Прогулка — 3D-двор после входа, без движения. Карта в новом билде включает автоматический обзор. Film / Галерея* — разные состояния раздела: статичный экран старой галереи и автоматическая смена глав в новом Film; это не тест воспроизведения одинакового видео.</p>
+      <p lang="en">Walkthrough measures the 3D courtyard after entry, without movement. The current Map includes its automatic tour. Film / Gallery* compares different section states: the original static gallery screen and the current Film's automatic chapter sequence, not playback of identical video.</p>
+      <p><a href="https://github.com/Danis812/digital-showroom/blob/main/benchmarks/2026-09-27_1080p_all_modes/README.md"><span lang="ru">Методика и исходные данные</span><span lang="en">Method and source data</span></a> · <a href="benchmarks/2026-09-27_1080p_all_modes/results.csv" download><span lang="ru">Все 36 прогонов · CSV</span><span lang="en">All 36 runs · CSV</span></a></p>
     </div>
 
     <div class="stack rise" style="margin-top:44px">
