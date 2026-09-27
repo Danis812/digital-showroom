@@ -34,6 +34,10 @@ The FPS figures live in `src/build.py` as the `FPS` list, and the sound board's
 order and tail markers in `SOUNDS`. Waveforms and durations are measured from
 the WAV files at build time, so changing the pack needs no hand-editing.
 
+The performance charts and table use the same `FPS` data. The current
+[1080p benchmark](benchmarks/2026-09-27_1080p/README.md) includes all 12 runs,
+raw frame intervals and a script to recalculate the results.
+
 The page carries Russian and English side by side, marked `lang="ru"` /
 `lang="en"`. Edit both; the build fails if a block exists in one and not the
 other.
