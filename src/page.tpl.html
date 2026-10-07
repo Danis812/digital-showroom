@@ -478,7 +478,7 @@ tbody td.delta { color: var(--gold); }
 .hero-stat .arrow { color: var(--text-4); font-family: var(--display); font-size: 1.6rem; font-weight: 200; }
 .hero-stat .note { color: var(--text-3); font-size: 14.5px; max-width: 22rem; }
 
-/* --- Timeline -------------------------------------------------------- */
+/* --- Stages -------------------------------------------------------- */
 
 .phases { display: flex; flex-direction: column; }
 .phase {
@@ -526,7 +526,7 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
     <a href="#arch"><span lang="ru">Устройство</span><span lang="en">Build</span></a>
     <a href="#perf"><span lang="ru">Оптимизация</span><span lang="en">Performance</span></a>
     <a href="#identity"><span lang="ru">Идентичность</span><span lang="en">Identity</span></a>
-    <a href="#timeline"><span lang="ru">Хронология</span><span lang="en">Timeline</span></a>
+    <a href="#stages"><span lang="ru">Этапы</span><span lang="en">Stages</span></a>
   </nav>
   <div class="lang">
     <button type="button" data-set-lang="ru">RU</button>
@@ -567,7 +567,6 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
     <p class="hero-sub" lang="en">A real-time interactive sales system for residential developments: free walkthrough, courtyard amenities, apartment search straight on the facade, a neighbourhood map and a chaptered gallery of the quarter. A demonstration build, made on the architectural model of MOD Fusion — a real residential quarter in Astana.</p>
     <div class="hero-meta">
       <div><span class="micro"><span lang="ru">Роль</span><span lang="en">Role</span></span><b>Solo design &amp; development</b></div>
-      <div><span class="micro"><span lang="ru">Срок</span><span lang="en">Duration</span></span><b><span lang="ru">8 месяцев</span><span lang="en">8 months</span></b></div>
       <div><span class="micro"><span lang="ru">Движок</span><span lang="en">Engine</span></span><b>Unreal Engine 5.7</b></div>
       <div><span class="micro"><span lang="ru">Код</span><span lang="en">Code</span></span><b>C++ · Slate</b></div>
       <div><span class="micro"><span lang="ru">Платформа</span><span lang="en">Platform</span></span><b>Windows · Pixel Streaming</b></div>
@@ -624,8 +623,8 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
       <p lang="en"><strong>How it fits alongside architectural work.</strong> The project traces the path from a finished architectural model to an interactive application a developer can place on the sales floor. For an architecture practice it is a way to widen what it offers a client without stepping outside its own work: the model already exists, and the realtime part attaches to it.</p>
       <p lang="ru"><strong>Моя роль.</strong> Solo design &amp; development: подготовка архитектурной модели для Unreal Engine, построение realtime-сцены, свет, UX/UI, интерактивная логика, пять C++-плагинов, процедурная айдентика и звук, оптимизация, packaging и Pixel Streaming.</p>
       <p lang="en"><strong>My role.</strong> Solo design &amp; development: preparing the architectural model for Unreal Engine, building the realtime scene, lighting, UX/UI, interaction logic, five C++ plugins, procedural identity and sound, optimisation, packaging and Pixel Streaming.</p>
-      <p lang="ru"><strong>Метод.</strong> Код руками я не пишу. Реализацию выполняют агентные инструменты под моим техническим контролем: моя часть — архитектура, постановка задач, критика вариантов, воспроизводимая проверка и доведение до работающего билда. Именно этот метод объясняет, как продукт такого объёма собран одним человеком за восемь месяцев, считая прототип.</p>
-      <p lang="en"><strong>Method.</strong> I do not write the code by hand. The implementation is carried out by agentic tools under my technical direction: I own the architecture, the briefs, the critique of what comes back, the reproducible verification and getting it to a build that runs. That method is how a product of this size was put together by one person in eight months, prototype included.</p>
+      <p lang="ru"><strong>Метод.</strong> Код руками я не пишу. Реализацию выполняют агентные инструменты под моим техническим контролем: моя часть — архитектура, постановка задач, критика вариантов, воспроизводимая проверка и доведение до работающего билда. Этот метод позволил одному человеку пройти весь путь от прототипа до работающего продукта.</p>
+      <p lang="en"><strong>Method.</strong> I do not write the code by hand. The implementation is carried out by agentic tools under my technical direction: I own the architecture, the briefs, the critique of what comes back, the reproducible verification and getting it to a build that runs. That method enabled one person to take the product from prototype to working build.</p>
       <p lang="ru"><strong>Исходные материалы.</strong> Архитектурная модель квартала и часть статичных визуализаций предоставлены Whila. Архитектурный моделинг и авторство этих изображений не входят в мою работу.</p>
       <p lang="en"><strong>Source material.</strong> The architectural model of the quarter and part of the static visualisations were provided by Whila. Architectural modelling and the authorship of those images are not my work.</p>
     </div>
@@ -828,8 +827,8 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
       <p class="micro"><span lang="ru">04 · Оптимизация</span><span lang="en">04 · Performance</span></p>
       <h2 lang="ru">Оптимизация: до 5,6 раза быстрее</h2>
       <h2 lang="en">Optimisation: up to 5.6× faster</h2>
-      <p class="lede" lang="ru">Оптимизировал Digital Showroom: до 5,6× выше средний FPS при 1920×1080 на RTX 4070 Laptop. Шесть недель работы охватили рендеринг, геометрию, текстуры, стриминг и настройки сцены. Ниже — результаты пяти разделов и главного меню: по три 30-секундных прогона в исходном и оптимизированном билдах.</p>
-      <p class="lede" lang="en">Optimised Digital Showroom for up to 5.6× higher average FPS at 1920×1080 on an RTX 4070 Laptop. Six weeks of work covered rendering, geometry, textures, streaming and scene settings. Below are results for all five sections and the main menu: three 30-second runs in each of the original and optimised builds.</p>
+      <p class="lede" lang="ru">Оптимизировал Digital Showroom: до 5,6× выше средний FPS при 1920×1080 на RTX 4070 Laptop. Работа охватила рендеринг, геометрию, текстуры, стриминг и настройки сцены. Ниже — результаты пяти разделов и главного меню: по три 30-секундных прогона в исходном и оптимизированном билдах.</p>
+      <p class="lede" lang="en">Optimised Digital Showroom for up to 5.6× higher average FPS at 1920×1080 on an RTX 4070 Laptop. The work covered rendering, geometry, textures, streaming and scene settings. Below are results for all five sections and the main menu: three 30-second runs in each of the original and optimised builds.</p>
     </div>
 
     <div class="hero-stat rise">
@@ -1048,9 +1047,9 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
     <p class="stack rise" style="margin-top: clamp(28px, 3.5vw, 40px); color: var(--text-3); font-size: 15px;"><span lang="ru">Два ролика выше собраны одной и той же сборкой — менялся только SVG на входе и число частиц под сложность формы. Знак Whila принадлежит компании; метод, код и звук — мои.</span><span lang="en">Both clips above came out of the same build — only the input SVG changed, and the particle count with it. The Whila symbol belongs to the company; the method, the code and the sound are mine.</span></p>
   </section>
 
-  <section id="timeline">
+  <section id="stages">
     <div class="head rise">
-      <p class="micro"><span lang="ru">07 · Хронология</span><span lang="en">07 · Timeline</span></p>
+      <p class="micro"><span lang="ru">07 · Этапы</span><span lang="en">07 · Stages</span></p>
       <h2 lang="ru">От первой сборки к собственной платформе</h2>
       <h2 lang="en">From a first build to a platform of its own</h2>
       <p class="lede" lang="ru">Проект развивался итеративно: быстрый MVP позволил проверить формат, после чего решение было пересобрано как самостоятельное realtime-приложение. Текущая версия остаётся R&amp;D-проектом — новые продуктовые и технические решения проходят проверку непосредственно в рабочей сборке.</p>
@@ -1073,7 +1072,7 @@ footer { padding: clamp(56px, 8vw, 92px) 0 72px; border-top: 1px solid var(--edg
         <p lang="en">A full rework of the interface: an in-house design system, Slate UI, transitions between sections, realtime effects, localisation and sound.</p>
       </div>
       <div class="phase">
-        <div class="phase-when"><b>Optimization</b><span class="micro"><span lang="ru">6 недель</span><span lang="en">6 weeks</span></span></div>
+        <div class="phase-when"><b>Optimization</b><span class="micro"><span lang="ru">Профилирование</span><span lang="en">Profiling</span></span></div>
         <p lang="ru">Отдельный цикл профилирования и оптимизации рендеринга, геометрии, текстур, ассетов и памяти — с контролем времени кадра в целевых сценариях.</p>
         <p lang="en">A dedicated cycle of profiling and optimisation across rendering, geometry, textures, assets and memory — with frame time watched in the target scenarios.</p>
       </div>
