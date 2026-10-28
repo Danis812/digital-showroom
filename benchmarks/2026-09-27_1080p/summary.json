@@ -1,0 +1,38 @@
+[
+  {
+    "Build": "current",
+    "Section": "Units",
+    "Runs": 3,
+    "MedianAvgFPS": 56.19,
+    "MinAvgFPS": 56.1,
+    "MaxAvgFPS": 56.19,
+    "MedianOnePercentLowFPS": 49.11
+  },
+  {
+    "Build": "current",
+    "Section": "Zones",
+    "Runs": 3,
+    "MedianAvgFPS": 48.65,
+    "MinAvgFPS": 48.54,
+    "MaxAvgFPS": 48.68,
+    "MedianOnePercentLowFPS": 42.67
+  },
+  {
+    "Build": "old",
+    "Section": "Units",
+    "Runs": 3,
+    "MedianAvgFPS": 10.04,
+    "MinAvgFPS": 10.01,
+    "MaxAvgFPS": 10.12,
+    "MedianOnePercentLowFPS": 6.34
+  },
+  {
+    "Build": "old",
+    "Section": "Zones",
+    "Runs": 3,
+    "MedianAvgFPS": 10.96,
+    "MinAvgFPS": 8.75,
+    "MaxAvgFPS": 10.98,
+    "MedianOnePercentLowFPS": 6.46
+  }
+]

@@ -1,0 +1,13 @@
+Build,Section,Repeat,Frames,CapturedSeconds,AvgFPS,OnePercentLowFPS,P99FrameMs,MaxFrameMs,FramesOver1000ms,Resolution,Swapchains,PresentAPIs,SyncIntervals
+current,Zones,1,1463,30.053,48.68,42.84,23.052,23.865,0,1920x1080,1,Present,0
+current,Zones,2,1458,29.971,48.65,42.67,23.201,24.12,0,1920x1080,1,Present,0
+current,Zones,3,1455,29.973,48.54,42.31,23.242,24.902,0,1920x1080,1,Present,0
+current,Units,1,1687,30.021,56.19,49.11,19.94,21.449,0,1920x1080,1,Present,0
+current,Units,2,1685,29.987,56.19,49.22,19.925,20.844,0,1920x1080,1,Present,0
+current,Units,3,1683,30.0,56.1,48.64,19.938,24.273,0,1920x1080,1,Present,0
+old,Zones,1,329,29.955,10.98,6.64,147.779,154.251,0,1920x1080,1,Present,0
+old,Zones,2,261,29.82,8.75,6.46,153.668,155.541,0,1920x1080,1,Present,0
+old,Zones,3,328,29.92,10.96,6.2,150.997,165.617,0,1920x1080,1,Present,0
+old,Units,1,304,30.032,10.12,6.6,142.954,165.933,0,1920x1080,1,Present,0
+old,Units,2,300,29.969,10.01,6.34,145.452,164.384,0,1920x1080,1,Present,0
+old,Units,3,300,29.887,10.04,5.98,150.347,178.924,0,1920x1080,1,Present,0

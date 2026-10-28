@@ -1,0 +1,15 @@
+# Capture and encode masters. These are the sources the shipped media is made
+# from — hundreds of megabytes each, and nothing here needs them to build.
+*.mov
+*.mkv
+showroom-master-*.mp4
+
+# Working material that is not part of the published page
+behance/
+screenshots/
+*.bak
+
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
