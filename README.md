@@ -62,8 +62,8 @@ the attack is the entire sound. Nine files cost about 560 KB.
 ## Credits
 
 The project was developed at Whila. The architectural model of the quarter
-and part of the static visualisations came ready-made; nothing shown here is
-offered for reuse.
+and part of the static visualisations were prepared by colleagues in the
+visualisation team; nothing shown here is offered for reuse.
 
 ## Contact
 
