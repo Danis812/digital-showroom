@@ -1,4 +1,4 @@
-# MOD Fusion — optimisation benchmark
+# Digital Showroom — optimisation benchmark
 
 27 September 2026 · RTX 4070 Laptop · Ryzen 9 7940HS · 1920×1080
 

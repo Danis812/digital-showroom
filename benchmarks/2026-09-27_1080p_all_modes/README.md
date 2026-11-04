@@ -1,4 +1,4 @@
-# MOD Fusion — expanded 1080p benchmark
+# Digital Showroom — expanded 1080p benchmark
 
 27 September 2026 · RTX 4070 Laptop · Ryzen 9 7940HS · 1920×1080
 
@@ -75,7 +75,7 @@ Raw captures include warm-up and navigation outside the selected intervals. Only
 
 ## Кратко по-русски
 
-Итог: **оптимизация MOD Fusion — до 5,6 раза выше средний FPS (1920×1080, RTX 4070 Laptop).**
+Итог: **оптимизация Digital Showroom — до 5,6 раза выше средний FPS (1920×1080, RTX 4070 Laptop).**
 
 Проверены пять разделов и главное меню: 36 прогонов по 30 секунд, по три для каждого состояния и билда. Максимальный прирост — 5,60×; весь диапазон — 1,12–5,60×. В таблице медианы, а не среднее ускорение приложения.
 

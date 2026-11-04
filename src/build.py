@@ -36,7 +36,7 @@ SHOTS = ["menu", "walk", "film", "map", "zones", "units", "compare"]
 # Poster frames are inlined too, so the page still shows every section when it
 # travels as a single file without media/. You lose the motion, not the
 # picture — the <video> elements fall back to these same frames.
-POSTERS = ["walk", "film", "map", "zones", "units", "full", "intro", "danis"]
+POSTERS = ["walk", "film", "map", "zones", "units", "intro", "danis"]
 
 
 # --- UI sound board ---------------------------------------------------------

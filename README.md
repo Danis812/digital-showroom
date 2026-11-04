@@ -1,7 +1,7 @@
-# MOD Fusion — case study page
+# Digital Showroom — case study page
 
-Source for the case study page of **MOD Fusion**, an interactive real-time
-sales showroom for a residential quarter in Astana, built in Unreal Engine 5.7
+Source for the case study page of **Digital Showroom**, an interactive real-time
+sales showroom for a residential development, built in Unreal Engine 5.7
 as R&D at Whila.
 
 **Live page → https://danis812.github.io/digital-showroom/**
@@ -46,8 +46,8 @@ other.
 ## Why some assets are inlined and some are not
 
 Screenshots, poster frames and the sound pack are embedded as data URIs.
-The full walkthrough is embedded from YouTube; short interface loops and
-identity clips are referenced from `media/`.
+Short interface loops and identity clips are referenced from `media/`.
+The full walkthrough is available on request.
 
 The split follows one rule: **the page has to survive being sent as a single
 file.** Detached from `media/`, it still reads end to end — every section shows
