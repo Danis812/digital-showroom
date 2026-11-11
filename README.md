@@ -1,8 +1,14 @@
 # Digital Showroom — case study page
 
-Source for the case study page of **Digital Showroom**, an interactive real-time
-sales showroom for a residential development, built in Unreal Engine 5.7
-as R&D at Whila.
+Source for the case study page of **Digital Showroom**, an independent
+portfolio version of an interactive real-time sales showroom for a
+residential development, built in Unreal Engine 5.7.
+
+The project grew out of internal R&D at Whila, where I led development
+from an early prototype to a Windows build for client demonstrations. I
+built the portfolio version separately on my own time, with my own UX/UI,
+interaction systems and application architecture, drawing on selected
+concepts from the original work. The original implementation remains internal to Whila.
 
 **Live page → https://danis812.github.io/digital-showroom/**
 
@@ -61,9 +67,10 @@ the attack is the entire sound. Nine files cost about 560 KB.
 
 ## Credits
 
-The project was developed at Whila. The architectural model of the quarter
-and part of the static visualisations were prepared by colleagues in the
-visualisation team; nothing shown here is offered for reuse.
+The architectural assets and branding belong to Whila and are shown with
+permission. Whila’s visualisation team prepared the architectural model
+and some of the still renderings. The materials shown here are reserved
+for display in this case study.
 
 ## Contact
 
